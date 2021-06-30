@@ -1,6 +1,6 @@
 <span align="center">
 
-# homebridge-doorbell-telegram-photo"
+# homebridge-doorbell-telegram-photo
 
 <a href="https://www.npmjs.com/package/homebridge-doorbell-telegram-photo"><img title="npm version" src="https://badgen.net/npm/v/homebridge-doorbell-telegram-photo" ></a>
 
