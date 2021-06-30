@@ -1,0 +1,34 @@
+{
+    "pluginAlias": "Doorbell-Telegram-Photo",
+    "pluginType": "accessory",
+    "singular": false,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string",
+          "required": true,
+          "default": "DoorbellPhotoTelegram"
+        },
+        "hostName": {
+            "title": "Snaphot URL",
+            "type": "string",
+            "required": true,
+            "description": "http(s) URL of camera to receive snapshot",
+            "default": "192.168.0.100"
+          },
+          "botId": {
+            "title": "ID of Bot",
+            "type": "string",
+            "required": true
+          },
+          "chatId": {
+            "title": "ID of Chat",
+            "type": "string",
+            "required": true
+          }
+      }
+    }
+  }
+  
