@@ -1,9 +1,6 @@
 /**
- * Copyright Roman Schlich
- * Februar 2021
- * Homebrigde Plugin for https://forum.fhem.de/index.php?topic=70738.0
- * Update URL for new vbs SW: https://raw.githubusercontent.com/verybadsoldier/esp_rgbww_fhemmodule/master/controls_espledcontroller.txt
- * API Spec: https://github.com/verybadsoldier/esp_rgbww_firmware/wiki/HTTP-Interface
+ * Developed by Roman Schlich
+ * July 2021
  */
 
 import {
@@ -20,7 +17,6 @@ import {
   Service
 } from "homebridge";
 import { request } from 'http';
-//import TelegramBot from "node-telegram-bot-api";
 const TelegramBot = require('node-telegram-bot-api');
 import { URL } from 'url';
 const Telegram = require('node-telegram-bot-api');
@@ -44,6 +40,7 @@ class DoorbellPhoto implements AccessoryPlugin {
   private readonly name: string;
   private readonly botId: string;
   private readonly chatId: string;
+  private readonly locale: string;
   private host: string;
   private timer: NodeJS.Timeout;
   private api:API;
@@ -58,6 +55,7 @@ class DoorbellPhoto implements AccessoryPlugin {
     this.host = config.hostName;
     this.botId = config.botId;
     this.chatId = config.chatId;
+    this.locale = config.locale || "de-DE";
     this.api = api;
 
     this.telegramAPI = new TelegramBot(this.botId, {
@@ -80,7 +78,7 @@ class DoorbellPhoto implements AccessoryPlugin {
     });
 
     this.informationService = new hap.Service.AccessoryInformation()
-      .setCharacteristic(hap.Characteristic.Manufacturer, "Schlich")
+      .setCharacteristic(hap.Characteristic.Manufacturer, "California444")
       .setCharacteristic(hap.Characteristic.Model, "Telegram Photo Doorbell")
       .setCharacteristic(hap.Characteristic.SoftwareRevision, version);
 
@@ -92,7 +90,7 @@ class DoorbellPhoto implements AccessoryPlugin {
   doorbellHandler(state:boolean): void {
 
     this.log.info('Doorbell ring...');
-    let timeInfo:String = new Date().toLocaleString('de-DE');
+    let timeInfo:String = new Date().toLocaleString(this.locale);
 
     this.timer = setTimeout(() => {
       this.log.debug('Doorbell handler timeout.'+timeInfo);
@@ -133,7 +131,7 @@ class DoorbellPhoto implements AccessoryPlugin {
         };
 
         this.telegramAPI.sendPhoto(this.chatId, result, {
-          caption: 'Klingel (' +timeInfo+')',
+          caption: this.name +'  (' +timeInfo+')',
         }, fileOptions);
         //console.log(result);
         response.statusCode == 200 ? this.log.info("Pic received") : this.log.error("Pic not received!")

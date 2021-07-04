@@ -1,7 +1,7 @@
 {
   "name": "homebridge-doorbell-telegram-photo",
   "displayName": "Doorbell Telegram Photo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Homebridge Plugin to send camera snapshoots on doorbell events to telegram",
   "main": "dist/accessory.js",
   "scripts": {
@@ -16,7 +16,9 @@
     "homebridge": ">=1.0.0"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "Doorbell photo",
+    "Telegram"
   ],
   "license": "ISC",
   "files": [
