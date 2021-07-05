@@ -125,14 +125,17 @@ class DoorbellPhoto implements AccessoryPlugin {
 
         let fileOptions = {
           // Explicitly specify the file name.
-          filename: 'Eingang.jpeg',
+          filename: 'photo.jpeg',
           // Explicitly specify the MIME type.
           contentType: 'image/jpeg'
         };
 
         this.telegramAPI.sendPhoto(this.chatId, result, {
           caption: this.name +'  (' +timeInfo+')',
-        }, fileOptions);
+        }, fileOptions).catch((error: any) => {
+          this.log.error(error.response.body);
+
+        });
         //console.log(result);
         response.statusCode == 200 ? this.log.info("Pic received") : this.log.error("Pic not received!")
       });
