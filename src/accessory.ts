@@ -3,6 +3,9 @@
  * July 2021
  */
 
+ process.env.NTBA_FIX_319 = "1";
+ process.env.NTBA_FIX_350 = "1";
+
 import {
   AccessoryConfig,
   AccessoryPlugin,
@@ -19,7 +22,6 @@ import {
 import { request } from 'http';
 const TelegramBot = require('node-telegram-bot-api');
 import { URL } from 'url';
-const Telegram = require('node-telegram-bot-api');
 
 let hap: HAP;
 
@@ -106,7 +108,7 @@ class DoorbellPhoto implements AccessoryPlugin {
 
     var url = new URL(this.host);
 
-     let options = {
+    let options = {
       url: url,
       method: 'GET',
       encoding: null,
@@ -121,29 +123,40 @@ class DoorbellPhoto implements AccessoryPlugin {
         chunks.push(chunk);
       });
       response.on('end', () => {
-        result = Buffer.concat(chunks);
+        if(response.statusCode == 200) {
+          this.log.info("Picture received successful!");
 
-        let fileOptions = {
-          // Explicitly specify the file name.
-          filename: 'photo.jpeg',
-          // Explicitly specify the MIME type.
-          contentType: 'image/jpeg'
-        };
+          result = Buffer.concat(chunks);
 
-        this.telegramAPI.sendPhoto(this.chatId, result, {
-          caption: this.name +'  (' +timeInfo+')',
-        }, fileOptions).catch((error: any) => {
-          this.log.error(error.response.body);
-
-        });
-        //console.log(result);
-        response.statusCode == 200 ? this.log.info("Pic received") : this.log.error("Pic not received!")
+          let fileOptions = {
+            // Explicitly specify the file name.
+            filename: 'photo.jpeg',
+            // Explicitly specify the MIME type.
+            contentType: 'image/jpeg'
+          };
+  
+          const logg = this.log;
+  
+          const promise = this.telegramAPI.sendPhoto(this.chatId, result, {
+            caption: this.name +'  (' +timeInfo+')',
+          }, fileOptions);
+  
+          promise.then(
+            function(success: any) {
+              logg.info("Send photo successful!");
+  
+            }, 
+            function(error: any) {
+              logg.error("Error while sending photo to Telegram!");
+              logg.error(error.message);
+          })
+        }
+        else {
+          this.log.error("No Picture received! "+response.statusCode);
+        }
       });
-      
     });
     req.end();
-    
-
   }
 
   shutdown(): void {
