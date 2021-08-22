@@ -15,18 +15,18 @@
             "title": "Snaphot URL",
             "type": "string",
             "required": true,
-            "description": "http(s) URL of camera to receive snapshot.",
+            "description": "http(s) URL of camera to receive snapshot from.",
             "default": "192.168.0.100"
           },
           "botId": {
             "title": "ID of Bot",
-            "description": "ID of telegram bot without leading bot.",
+            "description": "ID of telegram bot (without leading bot).",
             "type": "string",
             "required": true
           },
           "chatId": {
             "title": "ID of Chat",
-            "description": "ID of the Telegram chat to send the picture to.",
+            "description": "ID of the Telegram chat to send the picture to (including minus sign).",
             "type": "string",
             "required": true
           },
