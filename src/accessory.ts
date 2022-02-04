@@ -5,7 +5,8 @@
 
  process.env.NTBA_FIX_319 = "1";
  process.env.NTBA_FIX_350 = "1";
-
+ const TelegramBot = require('node-telegram-bot-api');
+ 
 import {
   AccessoryConfig,
   AccessoryPlugin,
@@ -20,7 +21,7 @@ import {
   Service
 } from "homebridge";
 import { request } from 'http';
-const TelegramBot = require('node-telegram-bot-api');
+
 import { URL } from 'url';
 
 let hap: HAP;
