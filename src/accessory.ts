@@ -121,9 +121,6 @@ class DoorbellPhoto implements AccessoryPlugin {
     let result: Buffer;
 
     try {
-
-    
-
       const req = request(url, options, response => {
         response.setEncoding('binary');
         const chunks: any[] = [];
@@ -131,7 +128,11 @@ class DoorbellPhoto implements AccessoryPlugin {
           chunks.push(Buffer.from(chunk, 'binary'));
         });
         response.on('end', () => {
+          response.rawHeaders.forEach(elem => {
+            this.log.debug(elem);
+          });
           if(response.statusCode == 200) {
+            
             this.log.info("Picture received successful!");
 
             result = Buffer.concat(chunks);
