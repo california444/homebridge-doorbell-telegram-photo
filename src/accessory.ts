@@ -21,6 +21,7 @@ import {
   Service
 } from "homebridge";
 import { request } from 'http';
+import { RequestOptions } from "https";
 
 import { URL } from 'url';
 
@@ -113,51 +114,60 @@ class DoorbellPhoto implements AccessoryPlugin {
       url: url,
       method: 'GET',
       encoding: null,
-      timeout: 5000
-    }
+      timeout: 5000,
+      insecureHTTPParser:true
+    } as RequestOptions;
 
     let result: Buffer;
 
-    const req = request(url, options, response => {
-      const chunks: any[] = [];
-      response.on('data', (chunk) => {
-        chunks.push(chunk);
-      });
-      response.on('end', () => {
-        if(response.statusCode == 200) {
-          this.log.info("Picture received successful!");
+    try {
 
-          result = Buffer.concat(chunks);
+    
 
-          let fileOptions = {
-            // Explicitly specify the file name.
-            filename: 'photo.jpeg',
-            // Explicitly specify the MIME type.
-            contentType: 'image/jpeg'
-          };
-  
-          const logg = this.log;
-  
-          const promise = this.telegramAPI.sendPhoto(this.chatId, result, {
-            caption: this.name +'  (' +timeInfo+')',
-          }, fileOptions);
-  
-          promise.then(
-            function(success: any) {
-              logg.info("Send photo successful!");
-  
-            }, 
-            function(error: any) {
-              logg.error("Error while sending photo to Telegram!");
-              logg.error(error.message);
-          })
-        }
-        else {
-          this.log.error("No Picture received! "+response.statusCode);
-        }
+      const req = request(url, options, response => {
+        response.setEncoding('binary');
+        const chunks: any[] = [];
+        response.on('data', (chunk) => {
+          chunks.push(Buffer.from(chunk, 'binary'));
+        });
+        response.on('end', () => {
+          if(response.statusCode == 200) {
+            this.log.info("Picture received successful!");
+
+            result = Buffer.concat(chunks);
+
+            let fileOptions = {
+              // Explicitly specify the file name.
+              filename: 'photo.jpeg',
+              // Explicitly specify the MIME type.
+              contentType: 'image/jpeg'
+            };
+    
+            const logg = this.log;
+    
+            const promise = this.telegramAPI.sendPhoto(this.chatId, result, {
+              caption: this.name +'  (' +timeInfo+')',
+            }, fileOptions);
+    
+            promise.then(
+              function(success: any) {
+                logg.info("Send photo successful!");
+    
+              }, 
+              function(error: any) {
+                logg.error("Error while sending photo to Telegram!");
+                logg.error(error.message);
+            })
+          }
+          else {
+            this.log.error("No Picture received! "+response.statusCode);
+          }
+        });
       });
-    });
-    req.end();
+      req.end();
+    } catch(e: any) {
+      this.log.error(e.message);
+    }
   }
 
   shutdown(): void {
