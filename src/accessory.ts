@@ -110,6 +110,17 @@ class DoorbellPhoto implements AccessoryPlugin {
 
     var url = new URL(this.host);
 
+    // check if auth information is included in URL
+
+    const regexp = /(^[htps]*\:\/\/)([\w\:]*)(@)/;
+    let match = url.toString().match(regexp);
+
+    let authInfo;
+    if(match && match[2] && match[2].includes(":")) {
+      authInfo = match[2];
+      this.log.debug("Extracted auth info from url: " + authInfo);
+    }
+
     let options = {
       url: url,
       method: 'GET',
@@ -117,6 +128,8 @@ class DoorbellPhoto implements AccessoryPlugin {
       timeout: 5000,
       insecureHTTPParser:true
     } as RequestOptions;
+
+    if(authInfo) options.auth = authInfo;
 
     let result: Buffer;
 
@@ -157,11 +170,10 @@ class DoorbellPhoto implements AccessoryPlugin {
               }, 
               function(error: any) {
                 logg.error("Error while sending photo to Telegram!");
-                logg.error(error.message);
             })
           }
           else {
-            this.log.error("No Picture received! "+response.statusCode);
+            this.log.error("No Picture received! "+response.statusCode+" "+response.statusMessage);
           }
         });
       });
