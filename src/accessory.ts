@@ -17,13 +17,11 @@ import {
   CharacteristicSetCallback,
   CharacteristicValue,
   HAP,
+  Logger,
   Logging,
   Service
 } from "homebridge";
-import { request } from 'http';
-import { RequestOptions } from "https";
-
-import { URL } from 'url';
+import request, { AuthOptions, CoreOptions, Request } from "request";
 
 let hap: HAP;
 
@@ -66,8 +64,8 @@ class DoorbellPhoto implements AccessoryPlugin {
       filepath: false,
     });
 
-    this.log.debug("botid: "+this.botId);
-    this.log.debug("chatId: "+this.chatId);
+    this.log.debug("Then botId is: "+this.botId);
+    this.log.debug("The chatId is: "+this.chatId);
 
     this.doorbellPhotoService = new hap.Service.Switch(this.name);
 
@@ -78,7 +76,6 @@ class DoorbellPhoto implements AccessoryPlugin {
     })
     .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
       callback(null, false);
-
     });
 
     this.informationService = new hap.Service.AccessoryInformation()
@@ -93,7 +90,7 @@ class DoorbellPhoto implements AccessoryPlugin {
 
   doorbellHandler(state:boolean): void {
 
-    this.log.info('Doorbell ring...');
+    this.log.info('Doorbell ring received.');
     let timeInfo:String = new Date().toLocaleString(this.locale);
 
     this.timer = setTimeout(() => {
@@ -101,24 +98,22 @@ class DoorbellPhoto implements AccessoryPlugin {
       this.doorbellPhotoService.updateCharacteristic(hap.Characteristic.On, false);
     }, 1000);
 
-    /**
-     * request URL
-     * 
-     */
+    const url = this.host;
 
-     //this.telegramAPI.sendMessage(this.chatId, timeInfo);
-
-    var url = new URL(this.host);
-
-    // check if auth information is included in URL
+    // check if auth information is included in URL and extract it
 
     const regexp = /(^[htps]*\:\/\/)([\w\:]*)(@)/;
-    let match = url.toString().match(regexp);
+    let match = url.match(regexp);
 
-    let authInfo;
+    let user;
+    let pass;
     if(match && match[2] && match[2].includes(":")) {
-      authInfo = match[2];
-      this.log.debug("Extracted auth info from url: " + authInfo);
+      let tokens = match[2].split(":");
+      if(tokens.length == 2) {
+        user = tokens[0];
+        pass = tokens[1];
+        this.log.debug("Extracted user/pass auth info from url...");
+      }
     }
 
     let options = {
@@ -127,57 +122,55 @@ class DoorbellPhoto implements AccessoryPlugin {
       encoding: null,
       timeout: 5000,
       insecureHTTPParser:true
-    } as RequestOptions;
+    } as CoreOptions;
 
-    if(authInfo) options.auth = authInfo;
 
-    let result: Buffer;
+    if(user && pass) options.auth = {
+      'user':user,
+      'pass':pass,
+      'sendImmediately':false
+    } as AuthOptions;
+
+    let logger: Logger = this.log;
+    let that = this;
 
     try {
-      const req = request(url, options, response => {
+      const req1: Request = request(url.toString(), options, function (error, response, body) {
+        if(error) logger.error(error);
         response.setEncoding('binary');
-        const chunks: any[] = [];
-        response.on('data', (chunk) => {
-          chunks.push(Buffer.from(chunk, 'binary'));
+
+        response.rawHeaders.forEach(elem => {
+          logger.debug(elem);
         });
-        response.on('end', () => {
-          response.rawHeaders.forEach(elem => {
-            this.log.debug(elem);
-          });
-          if(response.statusCode == 200) {
+
+        if(response.statusCode == 200) {
             
-            this.log.info("Picture received successful!");
+          logger.info("Picture received successful!");
 
-            result = Buffer.concat(chunks);
-
-            let fileOptions = {
-              // Explicitly specify the file name.
-              filename: 'photo.jpeg',
-              // Explicitly specify the MIME type.
-              contentType: 'image/jpeg'
-            };
-    
-            const logg = this.log;
-    
-            const promise = this.telegramAPI.sendPhoto(this.chatId, result, {
-              caption: this.name +'  (' +timeInfo+')',
-            }, fileOptions);
-    
-            promise.then(
-              function(success: any) {
-                logg.info("Send photo successful!");
-    
-              }, 
-              function(error: any) {
-                logg.error("Error while sending photo to Telegram!");
-            })
-          }
-          else {
-            this.log.error("No Picture received! "+response.statusCode+" "+response.statusMessage);
-          }
-        });
+          let fileOptions = {
+            // Explicitly specify the file name.
+            filename: 'photo.jpeg',
+            // Explicitly specify the MIME type.
+            contentType: 'image/jpeg'
+          };
+  
+          const promise = that.telegramAPI.sendPhoto(that.chatId, body, {
+            caption: that.name +'  (' +timeInfo+')',
+          }, fileOptions);
+  
+          promise.then(
+            function(success: any) {
+              logger.info("Send photo successful!");
+  
+            }, 
+            function(error: any) {
+              logger.error("Error while sending photo to Telegram!");
+          })
+        }
+        else {
+          logger.error("No Picture received! "+response.statusCode+" "+response.statusMessage);
+        }
       });
-      req.end();
     } catch(e: any) {
       this.log.error(e.message);
     }
