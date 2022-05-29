@@ -22,6 +22,7 @@ import {
   Service
 } from "homebridge";
 import request, { AuthOptions, CoreOptions, Request } from "request";
+import { Ffmpeg } from "./ffmpeg";
 
 let hap: HAP;
 
@@ -47,6 +48,8 @@ class DoorbellPhoto implements AccessoryPlugin {
   private timer: NodeJS.Timeout;
   private api:API;
   private telegramAPI:any;
+  private readonly useFfmpeg: boolean;
+  private ffmpeg:Ffmpeg;
 
   private readonly doorbellPhotoService: Service;
   private readonly informationService: Service;
@@ -58,7 +61,9 @@ class DoorbellPhoto implements AccessoryPlugin {
     this.botId = config.botId;
     this.chatId = config.chatId;
     this.locale = config.locale || "de-DE";
+    this.useFfmpeg = config.useFfmpeg;
     this.api = api;
+    this.ffmpeg = new Ffmpeg(log, api);
 
     this.telegramAPI = new TelegramBot(this.botId, {
       filepath: false,
@@ -88,7 +93,7 @@ class DoorbellPhoto implements AccessoryPlugin {
     log.info("Finished initializing!");
   }
 
-  doorbellHandler(state:boolean): void {
+  async doorbellHandler(state:boolean) {
 
     this.log.info('Doorbell ring received.');
     let timeInfo:String = new Date().toLocaleString(this.locale);
@@ -100,7 +105,21 @@ class DoorbellPhoto implements AccessoryPlugin {
 
     const url = this.host;
 
-    // check if auth information is included in URL and extract it
+    if(this.useFfmpeg) {
+      this.log.debug("Using ffmpeg to grab the snapshot...");
+      
+      try {
+        const cached = !!this.ffmpeg.snapshotPromise;
+        if(cached) this.log.info("using cached picture...");
+        
+        let snapshot = await (this.ffmpeg.snapshotPromise || this.ffmpeg.fetchSnapshot(url, this.name));
+        this.sendPictureToTelegram(snapshot, timeInfo.toString());
+      } catch (e : any) {
+        this.log.error(e.message);
+      }
+    }
+    else {
+       // check if auth information is included in URL and extract it
 
     const regexp = /(^[htps]*\:\/\/)([\w\:]*)(@)/;
     let match = url.match(regexp);
@@ -146,26 +165,9 @@ class DoorbellPhoto implements AccessoryPlugin {
         if(response.statusCode == 200) {
             
           logger.info("Picture received successful!");
+          that.sendPictureToTelegram(body, timeInfo.toString());
 
-          let fileOptions = {
-            // Explicitly specify the file name.
-            filename: 'photo.jpeg',
-            // Explicitly specify the MIME type.
-            contentType: 'image/jpeg'
-          };
-  
-          const promise = that.telegramAPI.sendPhoto(that.chatId, body, {
-            caption: that.name +'  (' +timeInfo+')',
-          }, fileOptions);
-  
-          promise.then(
-            function(success: any) {
-              logger.info("Send photo successful!");
-  
-            }, 
-            function(error: any) {
-              logger.error("Error while sending photo to Telegram!");
-          })
+          
         }
         else {
           logger.error("No Picture received! "+response.statusCode+" "+response.statusMessage);
@@ -174,6 +176,33 @@ class DoorbellPhoto implements AccessoryPlugin {
     } catch(e: any) {
       this.log.error(e.message);
     }
+    }
+  }
+
+  sendPictureToTelegram(data:Buffer, timeInfo:string): void {
+
+    let fileOptions = {
+      // Explicitly specify the file name.
+      filename: 'photo.jpeg',
+      // Explicitly specify the MIME type.
+      contentType: 'image/jpeg'
+    };
+
+    const promise = this.telegramAPI.sendPhoto(this.chatId, data, {
+      caption: this.name +'  (' +timeInfo+')',
+    }, fileOptions);
+
+    let that = this;
+
+    promise.then(
+      function(success: any) {
+        that.log.info("Send photo successful!");
+
+      }, 
+      function(error: any) {
+        that.log.error("Error while sending photo to Telegram!");
+    })
+
   }
 
   shutdown(): void {

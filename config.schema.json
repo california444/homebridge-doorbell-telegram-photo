@@ -9,7 +9,8 @@
           "title": "Name",
           "type": "string",
           "required": true,
-          "default": "DoorbellPhotoTelegram"
+          "default": "DoorbellPhotoTelegram",
+          "description": "Name of the camera"
         },
         "hostName": {
             "title": "Snaphot URL",
@@ -36,6 +37,13 @@
             "description": "Locale String to format the Date and Time information",
             "required": true,
             "default": "de-DE"
+          },
+          "useFfmpeg": {
+            "title": "Use Ffmpeg",
+            "type": "boolean",
+            "description": "Use FFmpeg to grab the picture",
+            "required": true,
+            "default": false
           }
       }
     }
