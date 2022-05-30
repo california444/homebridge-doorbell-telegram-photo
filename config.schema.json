@@ -13,10 +13,10 @@
           "description": "Name of the camera"
         },
         "hostName": {
-            "title": "Snaphot URL",
+            "title": "Snaphot URL or FFmpeg command",
             "type": "string",
             "required": true,
-            "description": "http(s) URL of camera to receive snapshot.",
+            "description": "http(s) URL of camera to receive snapshot or the FFmpeg command (must include -i).",
             "default": "192.168.0.100"
           },
           "botId": {
@@ -34,14 +34,14 @@
           "locale": {
             "title": "Locale",
             "type": "string",
-            "description": "Locale String to format the Date and Time information",
+            "description": "Locale String to format the Date and Time information in the chat.",
             "required": true,
             "default": "de-DE"
           },
           "useFfmpeg": {
-            "title": "Use Ffmpeg",
+            "title": "Use FFmpeg to grab the pciture",
             "type": "boolean",
-            "description": "Use FFmpeg to grab the picture",
+            "description": "If enabled the picture is grabbed with FFmpeg. Must be used if the camera does not support an individual snapshot url.",
             "required": true,
             "default": false
           }
