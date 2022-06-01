@@ -46,6 +46,6 @@
   "dependencies": {
     "node-telegram-bot-api": "^0.57.0",
     "request":"2.88.2",
-    "ffmpeg-for-homebridge":"0.1.2"
+    "ffmpeg-for-homebridge":"0.1.4"
   }
 }
