@@ -36,7 +36,7 @@
     "url": "https://github.com/california444/homebridge-doorbell-telegram-photo/issues"
   },
   "devDependencies": {
-    "@types/node": "^17.0.36",
+    "@types/node": "^18.7.3",
     "@types/request": "2.48.8",
     "typescript": "^4.7.2",
     "rimraf": "^3.0.2",
