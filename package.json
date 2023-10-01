@@ -40,12 +40,23 @@
     "@types/request": "2.48.9",
     "typescript": "^5.1.6",
     "rimraf": "^5.0.0",
-    "homebridge": "^1.5.0"
+    "homebridge": "^1.5.0",
+    "tough-cookie":"~4.1.3"
   },
   "homepage": "https://github.com/california444/homebridge-doorbell-telegram-photo#readme",
   "dependencies": {
     "node-telegram-bot-api": "^0.63.0",
     "request":"2.88.2",
     "ffmpeg-for-homebridge":"2.1.0"
+  },
+  "overrides": {
+    "node-telegram-bot-api": {
+      "request": {
+        "tough-cookie": "$tough-cookie"
+      },
+      "request-promise": {
+        "tough-cookie": "$tough-cookie"
+      }
+    }
   }
 }
