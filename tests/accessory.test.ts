@@ -27,7 +27,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        });
+        }, 2000);
 
         test('Basic Auth', async () => {
             try {
@@ -38,7 +38,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        });
+        }, 2000);
 
         test('Send to API (JPEG)', async () => {
             try {
@@ -57,7 +57,8 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        });
+        }, 2000);
+
         test('Send to API (PNG)', async () => {
             try {
                 await requestAuth("GET", "http://httpbin.org/image/png", null, [], "arraybuffer").then((response) => {
@@ -74,7 +75,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        });
+        }, 2000);
 
         test('Send to API (FFMPEG)', async () => {
             const url = process.env.FFMPEG_URL || "";
@@ -93,6 +94,6 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        });
+        }, 5000);
     });
 });
