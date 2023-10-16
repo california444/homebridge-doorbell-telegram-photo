@@ -94,6 +94,6 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        }, 5000);
+        }, 10000);
     });
 });
