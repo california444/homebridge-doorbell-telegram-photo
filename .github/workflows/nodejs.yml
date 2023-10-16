@@ -7,6 +7,10 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  BOT_ID: ${{ vars.BOT_ID }}
+  CHAT_ID: ${{ vars.CHAT_ID }}
+  FFMPEG_URL: ${{ vars.FFMPEG_URL }}
 jobs:
   build:
 
