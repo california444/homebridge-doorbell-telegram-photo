@@ -78,7 +78,9 @@ describe('Doorbell', () => {
         }, 2000);
 
         test('Send to API (FFMPEG)', async () => {
-            const url = process.env.FFMPEG_URL || "";
+            //const url = process.env.FFMPEG_URL || "";
+            const url = "-i http://httpbin.org/image/png"
+
             try {
                 let telegramAPI = new TelegramBot(botId, {
                     filepath: false,
