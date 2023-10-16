@@ -1,12 +1,12 @@
 import { spawn } from 'child_process';
 import ffmpegPath from 'ffmpeg-for-homebridge';
-import {API, HAP, Logger } from 'homebridge';
+import { Logging2 } from './accessory';
 
 export class Ffmpeg {
-    private readonly log: Logger;
+    private readonly log: Logging2;
     snapshotPromise?: Promise<Buffer>;
 
-    constructor(log: Logger, api: API) {
+    constructor(log: Logging2) {
         this.log = log;
     }
 
@@ -49,6 +49,4 @@ export class Ffmpeg {
         });
         return this.snapshotPromise;
       }
-
 }
-

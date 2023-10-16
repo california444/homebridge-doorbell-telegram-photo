@@ -12,12 +12,14 @@
     "rootDir": "src",
     "outDir": "dist",
     "noImplicitAny": false,
+    "strictNullChecks": false,
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strictPropertyInitialization": false
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "./jest.config.ts" 
   ]
 }
