@@ -4,15 +4,19 @@ on:
   release: # Run when release is created
     types: [created]
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
+env:
+  BOT_ID: ${{ vars.BOT_ID }}
+  CHAT_ID: ${{ vars.CHAT_ID }}
+  FFMPEG_URL: ${{ vars.FFMPEG_URL }}
 jobs:
   build:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [16.x, 18.x]
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
@@ -25,8 +29,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: npm install and build
         run: |
-          npm ci
+          npm install
           npm run build --if-present
+          npm test
         env:
           CI: true
 
