@@ -17,7 +17,6 @@ import {
   CharacteristicSetCallback,
   CharacteristicValue,
   HAP,
-  Logger,
   Logging,
   Service
 } from "homebridge";
@@ -48,11 +47,10 @@ class DoorbellPhoto implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly name: string;
   private readonly botId: string;
-  private readonly chatId: string;
+  private readonly chatIds: string[];
   private readonly locale: string;
   private host: string;
   private timer: NodeJS.Timeout;
-  private api: API;
   private telegramAPI: any;
   private readonly useFfmpeg: boolean;
   private ffmpeg: Ffmpeg;
@@ -65,18 +63,19 @@ class DoorbellPhoto implements AccessoryPlugin {
     this.name = config.name;
     this.host = config.hostName;
     this.botId = config.botId;
-    this.chatId = config.chatId;
+    this.chatIds = config.chatIds || [];
     this.locale = config.locale || "de-DE";
     this.useFfmpeg = config.useFfmpeg;
-    this.api = api;
     this.ffmpeg = new Ffmpeg(log);
 
     this.telegramAPI = new TelegramBot(this.botId, {
       filepath: false,
     });
 
+    if(!this.chatIds || this.chatIds.length==0) this.chatIds[0] = config.chatId;
+
     this.log.debug("Then botId is: " + this.botId);
-    this.log.debug("The chatId is: " + this.chatId);
+    this.log.debug("The chatIds are: "+this.chatIds.toString());
 
     this.doorbellPhotoService = new hap.Service.Switch(this.name);
 
@@ -121,7 +120,10 @@ class DoorbellPhoto implements AccessoryPlugin {
 
         let snapshot = await (this.ffmpeg.snapshotPromise || this.ffmpeg.fetchSnapshot(url, this.name));
         //this.sendPictureToTelegram(snapshot, timeInfo.toString());
-        sendPictureToTelegram2(snapshot, logger, this.chatId, timeInfo.toString(), this.telegramAPI);
+        this.chatIds.forEach(chatID => {
+          sendPictureToTelegram2(snapshot, logger, chatID, timeInfo.toString(), this.telegramAPI);
+        });
+        
       } catch (e: any) {
         logger.error(e.message);
       }
@@ -131,12 +133,15 @@ class DoorbellPhoto implements AccessoryPlugin {
 
       requestAuth("GET", url, {}, creds, "arraybuffer").then((response) => {
         logger.info("Picture received successful!");
-        sendPictureToTelegram2(response.data, logger, this.chatId, this.name + '  (' + timeInfo + ')', this.telegramAPI).then(success => {
-          logger.info("Picture send to chatId: "+this.chatId);
-        })
-        .catch(error => {
-          logger.error("Picture not send due to error: " + error);
-        })
+        this.chatIds.forEach(chatID => {
+          sendPictureToTelegram2(response.data, logger, chatID, this.name + '  (' + timeInfo + ')', this.telegramAPI).then(success => {
+            logger.info("Picture send to chatId: "+chatID);
+          })
+          .catch(error => {
+            logger.error("Picture not send due to error: " + error);
+          });
+        });
+
       }).catch(error =>  {
         logger.error("No Picture received:" + error);
       });

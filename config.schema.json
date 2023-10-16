@@ -26,10 +26,24 @@
             "required": true
           },
           "chatId": {
-            "title": "ID of Chat",
-            "description": "ID of the Telegram chat to send the picture to.",
+            "title": "ID of Chat (deprecated)",
+            "description": "Please use the new section Chat-IDs.",
             "type": "string",
-            "required": true
+            "required": true,
+            "condition": {
+              "functionBody": "return model.chatIds.length === 0;"
+            }
+          },
+          "chatIds": {
+            "title": "Chat-IDs",
+            "description": "Chat-Ids of Telegram chats to send the picture to.",
+            "type": "array",
+            "required": true,
+            "items": {
+              "title": "Chat-ID",
+              "type": "string",
+              "description": "Chat-Id of the Telegram chat to send the picture to."
+            }
           },
           "locale": {
             "title": "Locale",
