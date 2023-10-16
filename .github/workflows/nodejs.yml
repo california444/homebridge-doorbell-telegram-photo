@@ -4,7 +4,7 @@ on:
   release: # Run when release is created
     types: [created]
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -27,6 +27,7 @@ jobs:
         run: |
           npm ci
           npm run build --if-present
+          npm test
         env:
           CI: true
 
