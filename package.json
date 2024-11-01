@@ -48,7 +48,7 @@
   "dependencies": {
     "axios": "^1.5.1",
     "crypto-ts": "^1.0.2",
-    "ffmpeg-for-homebridge": "2.1.1",
+    "ffmpeg-for-homebridge": "2.1.7",
     "node-telegram-bot-api": "^0.66.0",
     "ts-node": "^10.9.1",
     "tslog": "^4.9.2"
