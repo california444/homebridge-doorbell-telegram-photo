@@ -6,6 +6,8 @@ process.env.NTBA_FIX_319 = "1";
 process.env.NTBA_FIX_350 = "1";
 const TelegramBot = require('node-telegram-bot-api');
 
+const timeout = 20000;
+
 describe('Doorbell', () => {
     
     let botId = process.env.BOT_ID;
@@ -27,7 +29,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        }, 2000);
+        }, timeout);
 
         test('Basic Auth', async () => {
             try {
@@ -38,7 +40,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        }, 2000);
+        }, timeout);
 
         test('Send to API (JPEG)', async () => {
             try {
@@ -57,7 +59,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        }, 2000);
+        }, timeout);
 
         test('Send to API (PNG)', async () => {
             try {
@@ -75,7 +77,7 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        }, 2000);
+        }, timeout);
 
         test('Send to API (FFMPEG)', async () => {
             //const url = process.env.FFMPEG_URL || "";
@@ -96,6 +98,6 @@ describe('Doorbell', () => {
             } catch (error) {
                throw error;
             }
-        }, 10000);
+        }, timeout);
     });
 });

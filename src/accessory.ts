@@ -32,6 +32,8 @@ let hap: HAP;
 const PLUGIN_NAME = 'homebridge-doorbell-telegram-photo';
 const ACCESSORY_NAME = 'Doorbell-Telegram-Photo';
 const version = require('../package.json').version;
+
+const timeout:number = 5000;
 /*
  * Initializer function called when the plugin is loaded.
  */
@@ -322,7 +324,7 @@ export async function requestAuth(method: string, url: string, options, creds: s
   let response = axios({
     method: method,
     url: url,
-    timeout: 5000,
+    timeout: timeout,
     responseType: fetchAsType
   })
     .catch(err => {
@@ -330,7 +332,7 @@ export async function requestAuth(method: string, url: string, options, creds: s
         return axios({
           method: method,
           url: url,
-          timeout: 5000,
+          timeout: timeout,
           headers:  { "authorization": auth(err.response.headers['www-authenticate']) },
           responseType: fetchAsType
         })
