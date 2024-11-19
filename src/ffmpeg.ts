@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
-import pathToFfmpeg from "ffmpeg-for-homebridge";
+//import pathToFfmpeg from "ffmpeg-for-homebridge";
+var pathToFfmpeg = require("ffmpeg-for-homebridge");
 import { Logging2 } from './accessory';
 
 export class Ffmpeg {
@@ -19,7 +20,7 @@ export class Ffmpeg {
             ' -loglevel error';
     
           this.log.debug('Snapshot command: ' + url + ' ' + ffmpegArgs, cameraName);
-          const path:string = pathToFfmpeg.ffmpeg_for_homebridge || 'ffmpeg';
+          const path:string = pathToFfmpeg || 'ffmpeg';
           const ffmpeg = spawn(path, ffmpegArgs.split(/\s+/), { env: process.env });
     
           let snapshotBuffer = Buffer.alloc(0);
