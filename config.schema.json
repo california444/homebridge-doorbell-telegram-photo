@@ -1,6 +1,6 @@
 {
     "pluginAlias": "Doorbell-Telegram-Photo",
-    "pluginType": "accessory",
+    "pluginType": "platform",
     "singular": false,
     "schema": {
       "type": "object",
@@ -24,15 +24,6 @@
             "description": "ID of telegram bot without leading bot.",
             "type": "string",
             "required": true
-          },
-          "chatId": {
-            "title": "ID of Chat (deprecated)",
-            "description": "Please use the new section Chat-IDs.",
-            "type": "string",
-            "required": true,
-            "condition": {
-              "functionBody": "return model.chatIds.length === 0;"
-            }
           },
           "chatIds": {
             "title": "Chat-IDs",

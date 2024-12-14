@@ -1,29 +1,28 @@
-import { spawn } from 'child_process';
-//import pathToFfmpeg from "ffmpeg-for-homebridge";
-var pathToFfmpeg = require("ffmpeg-for-homebridge");
-import { Logging2 } from './accessory';
+import { spawn } from 'node:child_process';
+import pathToFfmpeg from "ffmpeg-for-homebridge";
+import { Logging2 } from './platformAccessory.js';
 
 export class Ffmpeg {
-    private readonly log: Logging2;
-    snapshotPromise?: Promise<Buffer>;
+  private readonly log: Logging2;
+  snapshotPromise?: Promise<Buffer>;
 
-    constructor(log: Logging2) {
-        this.log = log;
-    }
+  constructor(log: Logging2) {
+    this.log = log;
+  }
 
-    fetchSnapshot(url: string, cameraName:string): Promise<Buffer> {
-        this.snapshotPromise = new Promise((resolve, reject) => {
-          const ffmpegArgs = url + // Still
+  fetchSnapshot(url: string, cameraName:string): Promise<Buffer> {
+    this.snapshotPromise = new Promise((resolve, reject) => {
+      const ffmpegArgs = url + // Still
             ' -frames:v 1' +
             ' -f image2 -' +
             ' -hide_banner' +
             ' -loglevel error';
     
-          this.log.debug('Snapshot command: ' + url + ' ' + ffmpegArgs, cameraName);
-          const path:string = pathToFfmpeg || 'ffmpeg';
-          const ffmpeg = spawn(path, ffmpegArgs.split(/\s+/), { env: process.env });
+      this.log.debug('Snapshot command: ' + url + ' ' + ffmpegArgs, cameraName);
+      let path:string = pathToFfmpeg.ffmpeg_for_homebridge || 'ffmpeg';
+      const ffmpeg = spawn(path, ffmpegArgs.split(/\s+/), { env: process.env });
     
-          let snapshotBuffer = Buffer.alloc(0);
+      let snapshotBuffer = Buffer.alloc(0);
           ffmpeg.stdout!.on('data', (data) => {
             snapshotBuffer = Buffer.concat([snapshotBuffer, data]);
           });
@@ -48,7 +47,7 @@ export class Ffmpeg {
               this.snapshotPromise = undefined;
             }, 3 * 1000); // Expire cached snapshot after 3 seconds
           });
-        });
-        return this.snapshotPromise;
-      }
+    });
+    return this.snapshotPromise;
+  }
 }
