@@ -6,11 +6,11 @@ module.exports = {
     'src/**',
   ],
   verbose: true,
-  moduleDirectories: ["node_modules", "src", "dist"],
+  moduleDirectories: ['node_modules', 'src', 'dist'],
   transform: {
-    "\\.[jt]sx?$": "ts-jest",
+    '\\.[jt]sx?$': 'ts-jest',
   },
   moduleNameMapper: {
-    "(.+)\\.js": "$1"
+    '(.+)\\.js': '$1',
   },
 };

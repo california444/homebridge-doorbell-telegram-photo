@@ -1,6 +1,9 @@
 import { spawn } from 'node:child_process';
-import { ffmpeg_for_homebridge } from 'ffmpeg-for-homebridge';
+//import { ffmpeg_for_homebridge } from 'ffmpeg-for-homebridge';
 import { Logging2 } from './platformAccessory.js';
+//import path from 'node:path';
+//import { fs } from 'node:fs';
+import { ffmpeg_for_homebridge } from 'ffmpeg-for-homebridge';
 
 export class Ffmpeg {
   private readonly log: Logging2;
@@ -9,6 +12,18 @@ export class Ffmpeg {
   constructor(log: Logging2) {
     this.log = log;
   }
+
+  // ffmpegPath(): string | undefined {
+  //   //const __filename = fileURLToPath(import.meta.url);
+  //   //const __dirname = path.dirname(__filename);
+  //   //const __dirname = import.meta.dirname;
+  //   const ffmpegPath = path.resolve(__dirname, process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg');
+  //   if (fs.existsSync(ffmpegPath)) {
+  //     return ffmpegPath;
+  //   } else {
+  //     return undefined;
+  //   }
+  // }
 
   fetchSnapshot(url: string, cameraName:string): Promise<Buffer> {
     this.snapshotPromise = new Promise((resolve, reject) => {
@@ -20,7 +35,7 @@ export class Ffmpeg {
     
       this.log.debug('Snapshot command: ' + url + ' ' + ffmpegArgs, cameraName);
       const path:string = ffmpeg_for_homebridge || 'ffmpeg';
-      this.log.debug(`Path to ffmpeg: ${ffmpeg_for_homebridge}`);
+      this.log.debug(`Path to ffmpeg: ${path}`);
       const ffmpeg = spawn(path, ffmpegArgs.split(/\s+/), { env: process.env });
     
       let snapshotBuffer = Buffer.alloc(0);
