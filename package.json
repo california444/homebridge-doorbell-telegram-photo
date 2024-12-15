@@ -55,7 +55,7 @@
   },
   "homepage": "https://github.com/california444/homebridge-doorbell-telegram-photo#readme",
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "crypto-ts": "^1.0.2",
     "ffmpeg-for-homebridge": "^2.1.7",
     "node-telegram-bot-api": "^0.66.0",
