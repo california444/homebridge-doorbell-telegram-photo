@@ -20,7 +20,6 @@ export default describe('Doorbell', () => {
     
   describe('test auth', () => {
     test('Digest Auth', async () => {
-      // eslint-disable-next-line no-useless-catch
       try {
         await requestAuth('GET', 'http://httpbin.org/digest-auth/auth/user/passwd', null, ['user','passwd'], 'json').then((response) => {
           expect(response.status).toBe(200);
@@ -33,7 +32,6 @@ export default describe('Doorbell', () => {
     }, timeout);
 
     test('Basic Auth', async () => {
-      // eslint-disable-next-line no-useless-catch
       try {
         await requestAuth('GET', 'http://httpbin.org/basic-auth/user/passwd', null, ['user','passwd'], 'json').then((response) => {
           expect(response.status).toBe(200);
