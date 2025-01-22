@@ -8,6 +8,13 @@ import * as crypto from 'crypto';
 
 const timeout:number = 5000;
 
+export type Device = {
+  name:string,
+  hostName:string,
+  botId:string,
+  chatIds:string[]
+}
+
 export interface Logging2 {
   info(message: string, ...parameters: any[]): void;
   warn(message: string, ...parameters: any[]): void;
@@ -194,18 +201,19 @@ export class DoorbellTelegramPhotoAccessory {
   constructor(
     private readonly platform: DoorbellTelegramPhoto,
     private readonly accessory: PlatformAccessory,
+    private readonly device: Device,
   ) {
-
-    this.log = platform.log;
-    this.name = platform.config.name;
-    this.host = platform.config.hostName;
-    this.botId = platform.config.botId;
-    this.chatIds = platform.config.chatIds || [];
+    this.name = device.name;
+    this.host = device.hostName;
+    this.botId = device.botId;
+    this.chatIds = device.chatIds || [];
+    
+    this.log = platform.log;    
     this.locale = platform.config.locale || 'de-DE';
     this.useFfmpeg = platform.config.useFfmpeg;
     this.ffmpeg = new Ffmpeg(this.log);
 
-    this.telegramAPI = new TelegramBot(platform.config.botId, {
+    this.telegramAPI = new TelegramBot(this.botId, {
       filepath: false,
     });
 
@@ -215,10 +223,9 @@ export class DoorbellTelegramPhotoAccessory {
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'California444')
       .setCharacteristic(this.platform.Characteristic.Model, 'Telegram Photo Doorbell');
-    //.setCharacteristic(this.platform.Characteristic.SerialNumber, '');
 
     this.service = this.accessory.getService(this.platform.Service.Switch) || this.accessory.addService(this.platform.Service.Switch);
-    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.context.device.displayName);
+    this.service.setCharacteristic(this.platform.Characteristic.Name, this.name);
     this.service.getCharacteristic(this.platform.Characteristic.On)
       .onSet(this.doorbellHandler.bind(this)) // SET - bind to the `setOn` method below
       .onGet(this.getOn.bind(this)); // GET - bind to the `getOn` method below

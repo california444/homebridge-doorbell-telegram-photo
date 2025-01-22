@@ -1,18 +1,22 @@
 {
-    "pluginAlias": "Doorbell-Telegram-Photo",
-    "pluginType": "platform",
-    "singular": false,
-    "schema": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "title": "Name",
-          "type": "string",
-          "required": true,
-          "default": "DoorbellPhotoTelegram",
-          "description": "Name of the camera"
-        },
-        "hostName": {
+  "pluginAlias": "Doorbell-Telegram-Photo",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "devices": {
+      "type": "array",
+      "items": {
+        "title": "Cameras",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "required": true,
+            "default": "DoorbellPhotoTelegram",
+            "description": "Name of the camera"
+          },
+          "hostName": {
             "title": "Snaphot URL or FFmpeg command",
             "type": "string",
             "required": true,
@@ -35,22 +39,23 @@
               "type": "string",
               "description": "Chat-Id of the Telegram chat to send the picture to."
             }
-          },
-          "locale": {
-            "title": "Locale",
-            "type": "string",
-            "description": "Locale String to format the Date and Time information in the chat.",
-            "required": true,
-            "default": "de-DE"
-          },
-          "useFfmpeg": {
-            "title": "Use FFmpeg to grab the pciture",
-            "type": "boolean",
-            "description": "If enabled the picture is grabbed with FFmpeg. Must be used if the camera does not support an individual snapshot url.",
-            "required": true,
-            "default": false
           }
+        }
       }
+    },
+    "locale": {
+      "title": "Locale",
+      "type": "string",
+      "description": "Locale String to format the Date and Time information in the chat.",
+      "required": true,
+      "default": "de-DE"
+    },
+    "useFfmpeg": {
+      "title": "Use FFmpeg to grab the pciture",
+      "type": "boolean",
+      "description": "If enabled the picture is grabbed with FFmpeg. Must be used if the camera does not support an individual snapshot url.",
+      "required": true,
+      "default": false
     }
   }
-  
+}
