@@ -209,7 +209,8 @@ export class DoorbellTelegramPhotoAccessory {
     this.chatIds = device.chatIds || [];
     
     this.log = platform.log;    
-    this.locale = platform.config.locale || 'de-DE';
+    //this.locale = platform.config.locale || 'de-DE';
+    this.locale = Intl.DateTimeFormat().resolvedOptions().locale || 'en-US';
     this.useFfmpeg = platform.config.useFfmpeg;
     this.ffmpeg = new Ffmpeg(this.log);
 

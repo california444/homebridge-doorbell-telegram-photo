@@ -1,20 +1,20 @@
 {
-  "pluginAlias": "Doorbell-Telegram-Photo",
+  "pluginAlias": "DoorbellTelegramPhoto",
   "pluginType": "platform",
   "singular": true,
   "schema": {
     "devices": {
+      "title": "Cameras",
       "type": "array",
       "items": {
-        "title": "Cameras",
+        "title": "Camera",
         "type": "object",
         "properties": {
           "name": {
-            "title": "Name",
+            "title": "Camera Name",
             "type": "string",
             "required": true,
-            "default": "DoorbellPhotoTelegram",
-            "description": "Name of the camera"
+            "default": "DoorbellPhotoTelegram"
           },
           "hostName": {
             "title": "Snaphot URL or FFmpeg command",
@@ -24,31 +24,22 @@
             "default": "192.168.0.100"
           },
           "botId": {
-            "title": "ID of Bot",
-            "description": "ID of telegram bot without leading bot.",
+            "title": "Id of Bot (without leading 'bot')",
             "type": "string",
             "required": true
           },
           "chatIds": {
-            "title": "Chat-IDs",
-            "description": "Chat-Ids of Telegram chats to send the picture to.",
+            "title": "Chat-Ids",
+            "description": "Provide one or more chat-Id's of Telegram chats to send the picture to.",
             "type": "array",
             "required": true,
             "items": {
-              "title": "Chat-ID",
-              "type": "string",
-              "description": "Chat-Id of the Telegram chat to send the picture to."
+              "title": "Chat-Id",
+              "type": "string"
             }
           }
         }
       }
-    },
-    "locale": {
-      "title": "Locale",
-      "type": "string",
-      "description": "Locale String to format the Date and Time information in the chat.",
-      "required": true,
-      "default": "de-DE"
     },
     "useFfmpeg": {
       "title": "Use FFmpeg to grab the pciture",
