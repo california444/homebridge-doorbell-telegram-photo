@@ -1,6 +1,7 @@
 {
   "pluginAlias": "DoorbellTelegramPhoto",
   "pluginType": "platform",
+  "strictValidation": true,
   "singular": true,
   "schema": {
     "devices": {
@@ -40,6 +41,13 @@
           }
         }
       }
+    },
+    "locale": {
+      "title": "Locale",
+      "type": "string",
+      "description": "Locale String to format the Date and Time information in the chat.",
+      "required": true,
+      "default": "de-DE"
     },
     "useFfmpeg": {
       "title": "Use FFmpeg to grab the pciture",
