@@ -22,7 +22,11 @@ export interface Logging2 {
   debug(message: string, ...parameters: any[]): void;
 }
 
-export function sendPictureToTelegram2(data: Buffer, logger:Logging2, chatId:string|number, caption:string, tApi): Promise<TelegramBot.Message> {
+export function sendPictureToTelegram2(
+  data: Buffer,
+  logger:Logging2,
+  chatId:string|number,
+  caption:string, tApi): Promise<TelegramBot.Message> {
   const fileOptions = {
   // Explicitly specify the file name.
     filename: 'photo.jpeg',
@@ -49,11 +53,11 @@ function extractAuthInfo(url:string):string[] {
 
 /**
 * https://github.com/fgeorges/mlproj/blob/master/src/node.js#L323
-* @param method 
-* @param url 
-* @param options 
-* @param creds 
-* @returns 
+* @param method
+* @param url
+* @param options
+* @param creds
+* @returns
 */
 export async function requestAuth(method: string, url: string, options, creds: string[], fetchAsType):Promise<AxiosResponse> {
   let count = 0;
@@ -84,7 +88,7 @@ export async function requestAuth(method: string, url: string, options, creds: s
         attrs.push(key + '=' + quote + params[key] + quote);
       }
     };
-  
+
     attr('username', '"');
     attr('realm', '"');
     attr('nonce', '"');
@@ -118,7 +122,7 @@ export async function requestAuth(method: string, url: string, options, creds: s
         throw new Error('Not supported: qop is ' + params.qop);
       }
     }
-    
+
     ++count;
     const nc = ('00000000' + count).slice(-8);
     const cnonce = crypto.randomBytes(24).toString('hex');
@@ -184,7 +188,7 @@ export async function requestAuth(method: string, url: string, options, creds: s
  * Each accessory may expose multiple services of different service types.
  */
 export class DoorbellTelegramPhotoAccessory {
-    
+
   private service: Service;
   private telegramAPI: any;
   public readonly log: Logging;
@@ -207,10 +211,10 @@ export class DoorbellTelegramPhotoAccessory {
     this.host = device.hostName;
     this.botId = device.botId;
     this.chatIds = device.chatIds || [];
-    
-    this.log = platform.log;    
-    //this.locale = platform.config.locale || 'de-DE';
-    this.locale = Intl.DateTimeFormat().resolvedOptions().locale || 'en-US';
+
+    this.log = platform.log;
+    this.locale = platform.config.locale || 'de-DE';
+
     this.useFfmpeg = platform.config.useFfmpeg;
     this.ffmpeg = new Ffmpeg(this.log);
 
@@ -220,6 +224,7 @@ export class DoorbellTelegramPhotoAccessory {
 
     this.log.debug('Then botId is: ' + this.botId);
     this.log.debug('The chatIds are: '+this.chatIds.toString());
+
 
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'California444')
@@ -275,7 +280,7 @@ export class DoorbellTelegramPhotoAccessory {
               logger.error('Picture not send due to error: ' + error);
             });
         });
-      }).catch(error =>  {
+      }).catch(error => {
         logger.error('No Picture received:' + error);
       });
     }

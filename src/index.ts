@@ -16,7 +16,7 @@ export default (api: API) => {
   //   const updatedConfigs = oldConfigs.map(x => {
   //     const y = { ...x };
   //     y.platform = PLATFORM_NAME;
-  //     delete y.accessory;  
+  //     delete y.accessory;
   //     return y;
   //   });
   //   globalConfig.platforms.push(...updatedConfigs);

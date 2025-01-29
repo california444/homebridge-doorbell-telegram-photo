@@ -18,13 +18,13 @@ export class Ffmpeg {
             ' -f image2 -' +
             ' -hide_banner' +
             ' -loglevel error';
-    
+
       this.log.debug('Snapshot command: ' + url + ' ' + ffmpegArgs, cameraName);
-      
+
       const path:string = /*ffmpegPath.ffmpeg_for_homebridge*/ pathToFfmpeg || 'ffmpeg';
       this.log.debug(`Path to ffmpeg: ${path}`);
       const ffmpeg = spawn(path, ffmpegArgs.split(/\s+/), { env: process.env });
-    
+
       let snapshotBuffer = Buffer.alloc(0);
           ffmpeg.stdout!.on('data', (data) => {
             snapshotBuffer = Buffer.concat([snapshotBuffer, data]);
@@ -45,7 +45,7 @@ export class Ffmpeg {
             } else {
               reject('Failed to fetch snapshot.');
             }
-    
+
             setTimeout(() => {
               this.snapshotPromise = undefined;
             }, 3 * 1000); // Expire cached snapshot after 3 seconds
