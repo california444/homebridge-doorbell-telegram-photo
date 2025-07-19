@@ -25,6 +25,12 @@ export class DoorbellTelegramPhoto implements DynamicPlatformPlugin {
   ) {
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
+
+    if(!config.devices) {
+      this.log.error('Please fix your config for this plugin. No devices list was found.');
+      return;
+    }
+
     this.log.debug('Finished initializing platform:', PLATFORM_NAME);
     this.api.on('didFinishLaunching', () => {
       log.debug('Executed didFinishLaunching callback');
@@ -44,10 +50,6 @@ export class DoorbellTelegramPhoto implements DynamicPlatformPlugin {
   }
 
   discoverDevices() {
-    if(!this.config.devices) {
-      this.log.error('Please fix your config for this plugin. No devices list was found.');
-      return;
-    }
     this.config.devices.forEach((device: Device) => {
 
       const uuid = this.api.hap.uuid.generate(device.botId+device.name);
