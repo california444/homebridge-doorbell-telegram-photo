@@ -1,8 +1,8 @@
 {
   "name": "homebridge-doorbell-telegram-photo",
   "displayName": "Doorbell Telegram Photo",
-  "type": "commonjs",
-  "version": "1.0.1",
+  "type": "module",
+  "version": "1.0.2",
   "description": "Homebridge Plugin to send camera snapshoots on doorbell events to telegram",
   "main": "dist/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run build",
     "postpublish": "npm run clean",
-    "test": "jest",
+    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest",
     "lint": "eslint src",
     "lint:fix": "npm run lint -- --fix"
   },
