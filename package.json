@@ -10,7 +10,7 @@
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run build",
     "postpublish": "npm run clean",
-    "test": "jest",
+    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest",
     "lint": "eslint src",
     "lint:fix": "npm run lint -- --fix"
   },
