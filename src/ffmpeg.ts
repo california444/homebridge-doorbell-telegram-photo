@@ -1,7 +1,15 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { platform } from 'node:os';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Logging2 } from './platformAccessory.js';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pathToFfmpeg = require('ffmpeg-for-homebridge');
+
+// Calculate the path to ffmpeg-for-homebridge similar to how the package does it
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ffmpegBinary = platform() === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+const ffmpegForHomebridgePath = resolve(__dirname, '..', 'node_modules', 'ffmpeg-for-homebridge', ffmpegBinary);
+const pathToFfmpeg = existsSync(ffmpegForHomebridgePath) ? ffmpegForHomebridgePath : undefined;
 
 export class Ffmpeg {
   private readonly log: Logging2;
