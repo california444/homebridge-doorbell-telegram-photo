@@ -6,7 +6,7 @@
       "ES2022"
     ],
     "rootDir": "src",
-    "module": "CommonJS",
+    "module": "ES2022",
     "moduleResolution": "node",
     "strict": true,
     "declaration": true,
