@@ -43,7 +43,7 @@
     "@eslint/js": "^9.14.0",
     "@types/eslint__js": "^8.42.3",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.9.1",
+    "@types/node": "^24.9.1",
     "@types/node-telegram-bot-api": "^0.64.7",
     "eslint": "^9.14.0",
     "homebridge": "^2.0.0-beta.0",
