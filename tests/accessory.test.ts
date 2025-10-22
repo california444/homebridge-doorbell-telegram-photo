@@ -18,7 +18,7 @@ export default describe('Doorbell', () => {
   const telegramAPI = new TelegramBot(botId || '', {
     filepath: false,
   });
-  const logger = new Logger({ name: 'myLogger' });
+  const logger = new Logger({ name: 'myLogger', minLevel: 3  });
 
   describe('test auth', () => {
     test('Digest Auth', async () => {

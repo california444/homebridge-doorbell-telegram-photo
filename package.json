@@ -6,17 +6,15 @@
   "description": "Homebridge Plugin to send camera snapshoots on doorbell events to telegram",
   "main": "dist/index.js",
   "scripts": {
-    "clean": "rimraf ./dist",
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run build",
-    "postpublish": "npm run clean",
     "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest",
     "lint": "eslint src",
     "lint:fix": "npm run lint -- --fix"
   },
   "author": "Roman Schlich",
   "engines": {
-    "node": "^18.20.4 || ^20.18.0 || ^22.10.0",
+    "node": "^20.18.0 || ^22.10.0 || ^24.0.0",
     "homebridge": "^1.8.0 || ^2.0.0-beta.0"
   },
   "keywords": [
@@ -40,26 +38,25 @@
     "url": "https://github.com/california444/homebridge-doorbell-telegram-photo/issues"
   },
   "devDependencies": {
-    "@eslint/js": "^9.14.0",
-    "@types/eslint__js": "^8.42.3",
+    "@eslint/js": "^9.38.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
-    "@types/node-telegram-bot-api": "^0.64.7",
-    "eslint": "^9.14.0",
+    "@types/node-telegram-bot-api": "^0.64.11",
+    "eslint": "^9.38.0",
     "homebridge": "^2.0.0-beta.0",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.12.2"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
   },
   "homepage": "https://github.com/california444/homebridge-doorbell-telegram-photo#readme",
   "dependencies": {
-    "axios": "^1.7.9",
+    "axios": "^1.12.2",
     "crypto-ts": "^1.0.2",
-    "ffmpeg-for-homebridge": "^2.1.7",
+    "ffmpeg-for-homebridge": "^2.2.0",
     "node-telegram-bot-api": "^0.66.0",
-    "tslog": "^4.9.3"
+    "tslog": "^4.10.2"
   },
   "overrides": {
     "tough-cookie": "^4.1.3"
