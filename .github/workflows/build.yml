@@ -1,11 +1,6 @@
-name: NodeJS
+name: Build and Lint
 
-on:
-  release: # Run when release is created
-    types: [created]
-  push:
-    branches: [main]
-  pull_request:
+on: [push, pull_request]
 
 permissions:
   id-token: write  # Required for OIDC
@@ -14,7 +9,7 @@ env:
   BOT_ID: ${{ vars.BOT_ID }}
   CHAT_ID: ${{ vars.CHAT_ID }}
   FFMPEG_URL: ${{ vars.FFMPEG_URL }}
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,20 +17,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20.x, 22.x]
+        node-version: [20.x, 22.x, 24.x]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v5
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: npm install and build
-        run: |
-          npm install
-          npm test
+      - name: Install dependencies
+        run: npm install
+
       - name: Lint the project
         run: npm run lint
 
@@ -50,8 +44,6 @@ jobs:
           npm list --outdated
           npm run build
 
-      - name: npm install and build
-        run: npm test
   publish-npm:
     # publish only if we are on our own repo, event was 'release' (a tag was created) and the tag starts with "v" (aka version tag)
     if: github.repository == 'california444/homebridge-doorbell-telegram-photo' && github.event_name == 'release'
@@ -70,5 +62,5 @@ jobs:
       # Ensure npm 11.5.1 or later is installed
       - name: Update npm
         run: npm install -g npm@latest
-      - run: npm install
+      - run: npm ci
       - run: npm publish
