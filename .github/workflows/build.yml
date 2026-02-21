@@ -1,6 +1,11 @@
 name: Build and Lint
 
-on: [push, pull_request]
+on:
+  release: # Run when release is created
+    types: [created]
+  push:
+  pull_request:
+
 
 permissions:
   id-token: write  # Required for OIDC
