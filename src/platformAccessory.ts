@@ -112,33 +112,29 @@ export async function fetchWithAuth(
     return await fetch(sanitizedUrl, requestInit);
   };
 
-  try {
-    let response: Response;
+  let response: Response;
 
-    if (hasCreds) {
-      const [username, password] = urlCreds!;
-      // 1) try Digest first
-      response = await runFetch(new DigestClient(username, password));
+  if (hasCreds) {
+    const [username, password] = urlCreds!;
+    // 1) try Digest first
+    response = await runFetch(new DigestClient(username, password));
 
-      // 2) if not successful and server offers Basic, retry with basic mode
-      const wwwAuth = response.headers.get('www-authenticate') || '';
-      if (!response.ok && response.status === 401 && /\bbasic\b/i.test(wwwAuth)) {
-        response = await runFetch(new DigestClient(username, password, { basic: true }));
-      }
-    } else {
-      response = await runFetch();
+    // 2) if not successful and server offers Basic, retry with basic mode
+    const wwwAuth = response.headers.get('www-authenticate') || '';
+    if (!response.ok && response.status === 401 && /\bbasic\b/i.test(wwwAuth)) {
+      response = await runFetch(new DigestClient(username, password, { basic: true }));
     }
-
-    const responseLike = await toResponse(response);
-    if (!response.ok) {
-      const err: any = new Error(`Request failed with status ${response.status}`);
-      err.response = responseLike;
-      throw err;
-    }
-    return responseLike;
-  } finally {
-    clearTimeout(timeoutTimer);
+  } else {
+    response = await runFetch();
   }
+
+  const responseLike = await toResponse(response);
+  if (!response.ok) {
+    const err: any = new Error(`Request failed with status ${response.status}`);
+    err.response = responseLike;
+    throw err;
+  }
+  return responseLike;
 }
 
 export async function getSnapshot(url: string): Promise<Buffer> {
