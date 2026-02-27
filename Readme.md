@@ -2,7 +2,7 @@
 
 [![npm version](https://badgen.net/npm/v/homebridge-doorbell-telegram-photo)](https://www.npmjs.com/package/homebridge-doorbell-telegram-photo)
 [![npm version beta](https://badgen.net/npm/v/homebridge-doorbell-telegram-photo/beta)](https://www.npmjs.com/package/homebridge-doorbell-telegram-photo/v/beta)
-[![Node Build](https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/nodejs.yml/badge.svg)](https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/nodejs.yml)
+[![Node Build](https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/build.yml/badge.svg)](https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/build.yml)
 [![npm downloads](https://badgen.net/npm/dt/homebridge-doorbell-telegram-photo)](https://www.npmjs.com/package/homebridge-doorbell-telegram-photo)
 
 **homebridge-doorbell-telegram-photo** is a homebridge plugin to send pictures to Telegram chats e.g. based on a trigger, for example on a doorbell ring.
@@ -17,7 +17,6 @@ The plugin adds a switch to be used for an automation rule to trigger in case of
 
 The plugin supports Basic Auth and Digest Auth and can extract the credentials from the URL if they provided in the form of http(s)://USER:PASSWORD@host/path
 
-
 ## Installation
 
 - Install the plugin via Config UI X
@@ -29,7 +28,6 @@ The plugin supports Basic Auth and Digest Auth and can extract the credentials f
   - Check "use ffmpeg" option if your camera does not support an http(s) url for snapshots.
   - In the url field either provide the http URL for the snapshot of the camera or the ffmpeg command, e.g.:
   > -i rtsp://...
-
   > -fflags nobuffer -flags low_delay -fflags discardcorrupt -analyzeduration 0 -probesize 2000 -rtsp_transport tcp -i rtsp://...
 - In Home App add an automation rule that triggers the switch of this plugin in case of an doorbell event
 
