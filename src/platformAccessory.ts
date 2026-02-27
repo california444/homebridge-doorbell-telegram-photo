@@ -3,8 +3,7 @@ import type { CharacteristicValue, Logging, PlatformAccessory, Service } from 'h
 import type { DoorbellTelegramPhoto } from './platform.js';
 import TelegramBot from 'node-telegram-bot-api';
 import { Ffmpeg } from './ffmpeg.js';
-import axios, { AxiosResponse } from 'axios';
-import * as crypto from 'crypto';
+import DigestClient from 'digest-fetch';
 
 const timeout:number = 5000;
 
@@ -24,7 +23,6 @@ export interface Logging2 {
 
 export function sendPictureToTelegram2(
   data: Buffer,
-  logger:Logging2,
   chatId:string|number,
   caption:string, tApi): Promise<TelegramBot.Message> {
   const fileOptions = {
@@ -39,147 +37,109 @@ export function sendPictureToTelegram2(
   }, fileOptions);
 }
 
-function extractAuthInfo(url:string):string[] {
-// check if auth information is included in URL and extract it
-  const regexp = /(^[htps]*:\/\/)([\w:]*)(@)/;
-  const match = url.match(regexp);
-  if (match && match[2] && match[2].includes(':')) {
-    const tokens = match[2].split(':');
-    if (tokens.length === 2) {
-      return tokens;
+export type RequestAuthResponse<TData> = {
+  data: TData;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+};
+
+export type FetchResponseType = 'arraybuffer' | 'json' | 'text';
+
+export async function fetchWithAuth(
+  url: string,
+  responseType: FetchResponseType = 'arraybuffer',
+): Promise<RequestAuthResponse<any>> {
+
+  let sanitizedUrl = url;
+  let urlCreds: [string, string] | undefined;
+  try {
+    const parsed = new URL(url);
+    if (parsed.username && parsed.password) {
+      urlCreds = [decodeURIComponent(parsed.username), decodeURIComponent(parsed.password)];
     }
+    if (parsed.username || parsed.password) {
+      parsed.username = '';
+      parsed.password = '';
+      sanitizedUrl = parsed.toString();
+    }
+  } catch {
+    // ignore invalid URLs
   }
+
+  const hasCreds = !!urlCreds;
+
+  const requestInit: RequestInit = {
+    method: 'GET',
+  };
+
+  // Provide a fresh timeout-based AbortSignal for each use of this RequestInit.
+  // This avoids sharing a single AbortController across multiple HTTP attempts
+  // (for example, digest auth challenge + authenticated request or basic auth fallback).
+  Object.defineProperty(requestInit, 'signal', {
+    get: () => AbortSignal.timeout(timeout),
+  });
+  const parseBody = async (response: Response) => {
+    if (responseType === 'arraybuffer') {
+      const ab = await response.arrayBuffer();
+      return Buffer.from(ab);
+    }
+    if (responseType === 'json') {
+      return await response.json();
+    }
+    return await response.text();
+  };
+
+  const toResponse = async (response: Response): Promise<RequestAuthResponse<any>> => {
+    const data = await parseBody(response);
+    const headers: Record<string, string> = {};
+    response.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+
+    return {
+      data,
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    };
+  };
+
+  const runFetch = async (client?: DigestClient): Promise<Response> => {
+    if (client) {
+      return await client.fetch(sanitizedUrl, requestInit);
+    }
+    return await fetch(sanitizedUrl, requestInit);
+  };
+
+  let response: Response;
+
+  if (hasCreds) {
+    const [username, password] = urlCreds!;
+    // 1) try Digest first
+    response = await runFetch(new DigestClient(username, password));
+
+    // 2) if not successful and server offers Basic, retry with basic mode
+    const wwwAuth = response.headers.get('www-authenticate') || '';
+    if (!response.ok && response.status === 401 && /\bbasic\b/i.test(wwwAuth)) {
+      response = await runFetch(new DigestClient(username, password, { basic: true }));
+    }
+  } else {
+    response = await runFetch();
+  }
+
+  const responseLike = await toResponse(response);
+  if (!response.ok) {
+    const err: any = new Error(`Request failed with status ${response.status}`);
+    err.response = responseLike;
+    throw err;
+  }
+  return responseLike;
 }
 
-/**
-* https://github.com/fgeorges/mlproj/blob/master/src/node.js#L323
-* @param method
-* @param url
-* @param options
-* @param creds
-* @returns
-*/
-export async function requestAuth(method: string, url: string, options, creds: string[], fetchAsType):Promise<AxiosResponse> {
-  let count = 0;
-  const md5 = (name, str) => {
-    return crypto.createHash('md5').update(str).digest('hex');
-  };
-
-  const parseDigest = header => {
-    if (!header || header.slice(0, 7) !== 'Digest ') {
-      throw new Error('Expect WWW-Authenticate for digest, got: ' + header);
-    }
-    return header.substring(7).split(/,\s+/).reduce((obj, s) => {
-      const eq = s.indexOf('=');
-      if (eq === -1) {
-        throw new Error('Digest parsing: param with no equal sign: ' + s);
-      }
-      const name = s.slice(0, eq);
-      const value = s.slice(eq + 1);
-      obj[name] = value.replace(/"/g, '');
-      return obj;
-    }, {});
-  };
-
-  const renderDigest = params => {
-    const attrs = [];
-    const attr = (key, quote) => {
-      if (params[key]) {
-        attrs.push(key + '=' + quote + params[key] + quote);
-      }
-    };
-
-    attr('username', '"');
-    attr('realm', '"');
-    attr('nonce', '"');
-    attr('uri', '"');
-    attr('algorithm', '');
-    attr('response', '"');
-    attr('opaque', '"');
-    attr('qop', '');
-    attr('nc', '');
-    attr('cnonce', '"');
-    return 'Digest ' + attrs.join(', ');
-  };
-
-  const auth = header => {
-    if (header && header.slice(0, 6) === 'Basic ') {
-      return 'Basic ' + Buffer.from(creds[0] + ':' + creds[1]).toString('base64');
-    }
-
-    const params = parseDigest(header);
-    if (!params.qop) {
-      throw new Error('Not supported: qop is unspecified');
-    } else if (params.qop === 'auth-int') {
-      throw new Error('Not supported: qop is auth-int');
-    } else if (params.qop === 'auth') {
-    // keep going...
-    } else {
-      if (params.qop.split(/,/).includes('auth')) {
-      // keep going...
-        params.qop = 'auth';
-      } else {
-        throw new Error('Not supported: qop is ' + params.qop);
-      }
-    }
-
-    ++count;
-    const nc = ('00000000' + count).slice(-8);
-    const cnonce = crypto.randomBytes(24).toString('hex');
-
-    const ha1 = md5('ha1', creds[0] + ':' + params.realm + ':' + creds[1]);
-
-    let path;
-    if (url.startsWith('http://')) {
-      path = url.slice(7);
-    } else if (url.startsWith('https://')) {
-      path = url.slice(8);
-    } else {
-      throw new Error('URL is neither HTTP or HTTPS: ' + url);
-    }
-    const slash = path.indexOf('/');
-    path = slash === -1
-      ? '/'
-      : path.slice(slash);
-
-    const ha2 = md5('ha2', method + ':' + path);
-    const resp = md5('response', [ha1, params.nonce, nc, cnonce, params.qop, ha2].join(':'));
-    const auth = {
-      username: creds[0],
-      realm: params.realm,
-      nonce: params.nonce,
-      uri: path,
-      qop: params.qop,
-      response: resp,
-      nc: nc,
-      cnonce: cnonce,
-      opaque: params.opaque,
-      algorithm: params.algorithm,
-    };
-    return renderDigest(auth);
-  };
-
-  const response = axios({
-    method: method,
-    url: url,
-    timeout: timeout,
-    responseType: fetchAsType,
-  })
-    .catch(err => {
-      if (err?.response?.status === 401) {
-        return axios({
-          method: method,
-          url: url,
-          timeout: timeout,
-          headers:  { 'authorization': auth(err.response.headers['www-authenticate']) },
-          responseType: fetchAsType,
-        });
-      }
-      throw err;
-    }).catch(err => {
-      throw err;
-    });
-  return response;
+export async function getSnapshot(url: string): Promise<Buffer> {
+  const response = await fetchWithAuth(url, 'arraybuffer');
+  return response.data as Buffer;
 }
 
 /**
@@ -197,16 +157,19 @@ export class DoorbellTelegramPhotoAccessory {
   private readonly botId: string;
   private readonly chatIds: string[];
   private readonly locale: string;
-  private host: string;
-  private timer: NodeJS.Timeout;
+  private readonly host: string;
   private readonly useFfmpeg: boolean;
-  private ffmpeg: Ffmpeg;
+  private readonly ffmpeg: Ffmpeg;
+  private readonly platform: DoorbellTelegramPhoto;
+  private readonly accessory: PlatformAccessory;
 
   constructor(
-    private readonly platform: DoorbellTelegramPhoto,
-    private readonly accessory: PlatformAccessory,
-    private readonly device: Device,
+    platform: DoorbellTelegramPhoto,
+    accessory: PlatformAccessory,
+    device: Device,
   ) {
+    this.platform = platform;
+    this.accessory = accessory;
     this.name = device.name;
     this.host = device.hostName;
     this.botId = device.botId;
@@ -241,48 +204,57 @@ export class DoorbellTelegramPhotoAccessory {
 
     this.log.info('Doorbell ring received.');
     const timeInfo: string = new Date().toLocaleString(this.locale);
+    const caption = `${this.name}  (${timeInfo})`;
 
-    this.timer = setTimeout(() => {
+    setTimeout(() => {
       this.log.debug('Doorbell handler timeout.' + timeInfo);
       this.service.updateCharacteristic(this.platform.Characteristic.On, false);
     }, 1000);
 
     const url = this.host;
-    const logger: Logging = this.log;
+
+    const sendToAll = async (snapshot: Buffer) => {
+      const results = await Promise.allSettled(
+        this.chatIds.map((chatId) => sendPictureToTelegram2(snapshot, chatId, caption, this.telegramAPI)),
+      );
+
+      results.forEach((result, index) => {
+        const chatId = this.chatIds[index];
+        if (result.status === 'fulfilled') {
+          this.log.info('Picture send to chatId: ' + chatId);
+          return;
+        }
+
+        const reason: any = result.reason;
+        const message = reason?.message ? String(reason.message) : String(reason);
+        this.log.error('Picture not send to chatId: ' + chatId + ' due to error: ' + message);
+      });
+    };
 
     if (this.useFfmpeg) {
-      logger.debug('Using ffmpeg to grab the snapshot...');
+      this.log.debug('Using ffmpeg to grab the snapshot...');
 
       try {
         const cached = !!this.ffmpeg.snapshotPromise;
         if (cached) {
-          logger.info('using cached picture...');
+          this.log.info('using cached picture...');
         }
 
         const snapshot = await (this.ffmpeg.snapshotPromise || this.ffmpeg.fetchSnapshot(url, this.name));
-        this.chatIds.forEach(chatID => {
-          sendPictureToTelegram2(snapshot, logger, chatID, timeInfo.toString(), this.telegramAPI);
-        });
+        await sendToAll(snapshot);
       } catch (e: any) {
-        logger.error(e.message);
-        logger.debug(e.stack);
+        this.log.error(e.message);
+        this.log.debug(e.stack);
       }
     } else {
-      const creds = extractAuthInfo(url);
-
-      requestAuth('GET', url, {}, creds, 'arraybuffer').then((response) => {
-        logger.info('Picture received successful!');
-        this.chatIds.forEach(chatID => {
-          sendPictureToTelegram2(response.data, logger, chatID, this.name + '  (' + timeInfo + ')', this.telegramAPI).then(() => {
-            logger.info('Picture send to chatId: '+chatID);
-          })
-            .catch(error => {
-              logger.error('Picture not send due to error: ' + error);
-            });
-        });
-      }).catch(error => {
-        logger.error('No Picture received:' + error);
-      });
+      try {
+        const snapshot = await getSnapshot(url);
+        this.log.info('Picture received successful!');
+        await sendToAll(snapshot);
+      } catch (error: any) {
+        const message = error?.message ? String(error.message) : String(error);
+        this.log.error('No Picture received: ' + message);
+      }
     }
   }
 

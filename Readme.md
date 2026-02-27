@@ -1,9 +1,9 @@
 # homebridge-doorbell-telegram-photo
 
-<a href="https://www.npmjs.com/package/homebridge-doorbell-telegram-photo"><img title="npm version" src="https://badgen.net/npm/v/homebridge-doorbell-telegram-photo" ></a> 
-  <a href="https://www.npmjs.com/package/homebridge-doorbell-telegram-photo/v/beta"><img title="npm version beta" src="https://badgen.net/npm/v/homebridge-doorbell-telegram-photo/beta" ></a>
-<a href="https://www.npmjs.com/package/homebridge-doorbell-telegram-photo"><img title="Node Build" src="https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/nodejs.yml/badge.svg"></a>
-<a href="https://www.npmjs.com/package/homebridge-doorbell-telegram-photo"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-doorbell-telegram-photo"></a>
+[![npm version](https://badgen.net/npm/v/homebridge-doorbell-telegram-photo)](https://www.npmjs.com/package/homebridge-doorbell-telegram-photo)
+[![npm version beta](https://badgen.net/npm/v/homebridge-doorbell-telegram-photo/beta)](https://www.npmjs.com/package/homebridge-doorbell-telegram-photo/v/beta)
+[![Node Build](https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/nodejs.yml/badge.svg)](https://github.com/california444/homebridge-doorbell-telegram-photo/actions/workflows/nodejs.yml)
+[![npm downloads](https://badgen.net/npm/dt/homebridge-doorbell-telegram-photo)](https://www.npmjs.com/package/homebridge-doorbell-telegram-photo)
 
 **homebridge-doorbell-telegram-photo** is a homebridge plugin to send pictures to Telegram chats e.g. based on a trigger, for example on a doorbell ring.
 
