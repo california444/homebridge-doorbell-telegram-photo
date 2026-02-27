@@ -69,16 +69,16 @@ export async function fetchWithAuth(
 
   const hasCreds = !!urlCreds;
 
-  const controller = new AbortController();
-  const timeoutTimer = setTimeout(() => controller.abort(), timeout);
-  // avoid keeping the process alive in edge-cases
-  timeoutTimer.unref?.();
-
   const requestInit: RequestInit = {
     method: 'GET',
-    signal: controller.signal,
   };
 
+  // Provide a fresh timeout-based AbortSignal for each use of this RequestInit.
+  // This avoids sharing a single AbortController across multiple HTTP attempts
+  // (for example, digest auth challenge + authenticated request or basic auth fallback).
+  Object.defineProperty(requestInit, 'signal', {
+    get: () => AbortSignal.timeout(timeout),
+  });
   const parseBody = async (response: Response) => {
     if (responseType === 'arraybuffer') {
       const ab = await response.arrayBuffer();
