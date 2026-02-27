@@ -18,6 +18,7 @@ export default describe('Doorbell', () => {
   const telegramAPI = new TelegramBot(botId || '', {
     filepath: false,
   });
+
   const logger = new Logger({ name: 'myLogger', minLevel: 3  });
 
   describe('test auth', () => {
@@ -46,7 +47,6 @@ export default describe('Doorbell', () => {
 
     test('Send to API (JPEG)', async () => {
       try {
-
         await requestAuth('GET', BASE_URL+'/image/jpeg', null, [], 'arraybuffer').then((response) => {
           expect(response.status).toBe(200);
           sendPictureToTelegram2(response.data, logger, chatId, 'test', telegramAPI).then(success =>{
@@ -82,13 +82,9 @@ export default describe('Doorbell', () => {
     }, timeout);
 
     test('Send to API (FFMPEG)', async () => {
-      //const url = process.env.FFMPEG_URL || "";
       const url = '-i '+BASE_URL+'/image/png';
 
       try {
-        const telegramAPI = new TelegramBot(botId || '', {
-          filepath: false,
-        });
         const ffmpeg = new Ffmpeg(logger);
         const snapshot = await (ffmpeg.fetchSnapshot(url, 'test'));
 
