@@ -37,6 +37,6 @@ The plugin supports Basic Auth and Digest Auth and can extract the credentials f
 
 For the tests in `tests/` environment variables are used (e.g. Telegram `BOT_ID` and `CHAT_ID`).
 
-- Copy `.env.test.example` to `.env.test`
-- Fill in your values
+- Create a `.env.test` file in the project root
+- Add the required environment variables (e.g. `BOT_ID`, `CHAT_ID`) with your values
 - Run `npm test`
