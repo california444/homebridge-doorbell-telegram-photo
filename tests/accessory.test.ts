@@ -88,12 +88,12 @@ export default describe('Doorbell', () => {
         const ffmpeg = new Ffmpeg(logger);
         const snapshot = await (ffmpeg.fetchSnapshot(url, 'test'));
 
-        try {
-          sendPictureToTelegram2(snapshot, logger, chatId, 'FFMPEG', telegramAPI);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-          logger.error(e.message);
-        }
+        await sendPictureToTelegram2(snapshot, logger, chatId, 'FFMPEG', telegramAPI).then(success => {
+          expect(success.chat.id).toBe(chatId);
+        })
+          .catch(err => {
+            throw err;
+          });
       } catch (error) {
         throw error;
       }
