@@ -1,4 +1,4 @@
 import { config as loadEnv } from 'dotenv';
-import * as path from 'path';
+import * as path from 'node:path';
 
-loadEnv({ path: path.resolve(__dirname, '.env.test') });
+loadEnv({ path: path.resolve(process.cwd(), '.env.test') });

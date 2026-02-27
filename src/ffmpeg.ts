@@ -54,9 +54,10 @@ export class Ffmpeg {
               reject('Failed to fetch snapshot.');
             }
 
-            setTimeout(() => {
+            const expiryTimer = setTimeout(() => {
               this.snapshotPromise = undefined;
             }, 3 * 1000); // Expire cached snapshot after 3 seconds
+            expiryTimer.unref();
           });
     });
     return this.snapshotPromise;
