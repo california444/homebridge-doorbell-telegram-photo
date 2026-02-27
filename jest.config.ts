@@ -1,6 +1,7 @@
 export default {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
+  setupFiles: ['<rootDir>/tests/jest.setup.ts'],
   coverageReporters: ['lcov'],
   collectCoverageFrom: [
     'src/**',

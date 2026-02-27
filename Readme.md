@@ -32,3 +32,11 @@ The plugin supports Basic Auth and Digest Auth and can extract the credentials f
 
   > -fflags nobuffer -flags low_delay -fflags discardcorrupt -analyzeduration 0 -probesize 2000 -rtsp_transport tcp -i rtsp://...
 - In Home App add an automation rule that triggers the switch of this plugin in case of an doorbell event
+
+## Testing
+
+For the tests in `tests/` environment variables are used (e.g. Telegram `BOT_ID` and `CHAT_ID`).
+
+- Create a `.env.test` file in the project root
+- Add the required environment variables (e.g. `BOT_ID`, `CHAT_ID`) with your values
+- Run `npm test`
