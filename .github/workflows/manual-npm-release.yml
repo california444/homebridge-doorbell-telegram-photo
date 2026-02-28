@@ -1,0 +1,109 @@
+name: Manual npm Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git tag to publish from (e.g. v2.0.0)"
+        required: true
+        type: string
+      channel:
+        description: "npm dist-tag"
+        required: true
+        type: choice
+        options:
+          - latest
+          - beta
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: github.repository == 'california444/homebridge-doorbell-telegram-photo' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: manual-npm-release
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: List recent tags
+        run: |
+          echo "### Recent tags" >> "$GITHUB_STEP_SUMMARY"
+          git fetch --tags
+          git tag --sort=-creatordate | head -n 25 | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate inputs
+        env:
+          REF: ${{ inputs.ref }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          if [ -z "$REF" ]; then
+            echo "ref input is required (must be a tag like v2.0.0)" >&2
+            exit 1
+          fi
+
+          if [ "$REF" = "main" ]; then
+            echo "ref must be a tag (e.g. v2.0.0), not a branch" >&2
+            exit 1
+          fi
+
+          if ! echo "$REF" | grep -Eq '^v[0-9]+'; then
+            echo "ref should look like a version tag starting with 'v' (e.g. v2.0.0)" >&2
+            exit 1
+          fi
+
+          git fetch --tags
+          if ! git rev-parse "$REF" >/dev/null 2>&1; then
+            echo "ref not found: $REF" >&2
+            exit 1
+          fi
+
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION=${REF#v}
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)" >&2
+            exit 1
+          fi
+
+          # Guardrail: refuse prereleases on latest
+          if [ "$CHANNEL" = "latest" ] && echo "$PKG_VERSION" | grep -q -- '-'; then
+            echo "Refusing to publish a prerelease version to latest: $PKG_VERSION" >&2
+            exit 1
+          fi
+
+      - name: Run tests
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        run: |
+          if [ "${{ inputs.channel }}" = "beta" ]; then
+            npm publish --provenance --access public --tag beta
+          else
+            npm publish --provenance --access public
+          fi
