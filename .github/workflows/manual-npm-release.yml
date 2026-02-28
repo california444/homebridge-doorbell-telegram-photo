@@ -19,6 +19,10 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  BOT_ID: ${{ vars.BOT_ID }}
+  CHAT_ID: ${{ vars.CHAT_ID }}
+
 jobs:
   publish:
     if: github.repository == 'california444/homebridge-doorbell-telegram-photo' && github.ref == 'refs/heads/main'
