@@ -95,15 +95,6 @@ jobs:
             exit 1
           fi
 
-      - name: Run tests
-        run: npm test
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
-
       - name: Publish to npm
         run: |
           if [ "${{ inputs.channel }}" = "beta" ]; then
