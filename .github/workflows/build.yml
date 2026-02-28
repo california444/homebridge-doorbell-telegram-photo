@@ -1,11 +1,8 @@
 name: Build and Lint
 
 on:
-  release: # Run when release is created
-    types: [created]
-  push:
-    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 
 permissions:
@@ -48,24 +45,3 @@ jobs:
         run: |
             npm list --outdated    
             npm audit || true  # ignore failures
-
-  publish-npm:
-    # publish only if we are on our own repo, event was 'release' (a tag was created) and the tag starts with "v" (aka version tag)
-    if: github.repository == 'california444/homebridge-doorbell-telegram-photo' && github.event_name == 'release'
-
-    needs: build # only run if build succeeds
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22 # use the minimum required version
-          registry-url: https://registry.npmjs.org/
-          
-      # Ensure npm 11.5.1 or later is installed
-      - name: Update npm
-        run: npm install -g npm@latest
-      - run: npm ci
-      - run: npm publish

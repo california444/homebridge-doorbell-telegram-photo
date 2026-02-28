@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  BOT_ID: ${{ vars.BOT_ID }}
+  CHAT_ID: ${{ vars.CHAT_ID }}
+
+jobs:
+  release:
+    # Avoid running semantic-release on its own version-bump commit
+    if: github.repository == 'california444/homebridge-doorbell-telegram-photo' && !contains(github.event.head_commit.message, 'chore(release):')
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
