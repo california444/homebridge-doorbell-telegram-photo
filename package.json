@@ -64,7 +64,7 @@
     "digest-fetch": "^3.1.1",
     "ffmpeg-for-homebridge": "^2.2.1",
     "node-telegram-bot-api": "^0.67.0",
-    "tslog": "^4.10.2"
+    "tslog": "^5.1.0"
   },
   "overrides": {
     "tough-cookie": "^4.1.3"
