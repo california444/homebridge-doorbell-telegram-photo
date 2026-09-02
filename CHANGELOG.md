@@ -1,3 +1,13 @@
+## [2.0.0](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v1.2.0...v2.0.0) (2026-09-02)
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** migrate to node-telegram-bot-api v2
+
+### Features
+
+* **deps:** migrate to node-telegram-bot-api v2 ([29a94e6](https://github.com/california444/homebridge-doorbell-telegram-photo/commit/29a94e69db2a935835ad50f242935aab0e0e10b9)), closes [#416](https://github.com/california444/homebridge-doorbell-telegram-photo/issues/416)
+
 ## [1.2.0](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v1.1.4...v1.2.0) (2026-02-28)
 
 ### Features
