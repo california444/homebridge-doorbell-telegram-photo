@@ -5,6 +5,10 @@
       "DOM",
       "ES2022"
     ],
+    "types": [
+      "jest",
+      "node"
+    ],
     "rootDir": "src",
     "module": "ESNext",
     "moduleResolution": "bundler",
