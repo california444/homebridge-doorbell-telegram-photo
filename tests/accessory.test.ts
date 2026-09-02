@@ -2,9 +2,7 @@
 import { fetchWithAuth, getSnapshot, sendPictureToTelegram2 } from '../src/platformAccessory.js';
 import { Logger } from 'tslog';
 import { Ffmpeg } from '../src/ffmpeg.js';
-process.env.NTBA_FIX_319 = '1';
-process.env.NTBA_FIX_350 = '1';
-import TelegramBot from 'node-telegram-bot-api';
+import { Api } from 'node-telegram-bot-api';
 
 const timeout = 20000;
 
@@ -16,9 +14,7 @@ export default describe('Doorbell', () => {
   const botId = process.env.BOT_ID;
   const chatId = parseInt(process.env.CHAT_ID || '');
 
-  const telegramAPI = new TelegramBot(botId || '', {
-    filepath: false,
-  });
+  const telegramAPI = new Api(botId || '');
 
   const logger = new Logger({ name: 'myLogger', minLevel: 3  });
 

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CharacteristicValue, Logging, PlatformAccessory, Service } from 'homebridge';
 import type { DoorbellTelegramPhoto } from './platform.js';
-import TelegramBot from 'node-telegram-bot-api';
+import { Api, InputFile } from 'node-telegram-bot-api';
+import type { Message } from 'node-telegram-bot-api';
 import { Ffmpeg } from './ffmpeg.js';
 import DigestClient from 'digest-fetch';
 
@@ -24,17 +25,18 @@ export interface Logging2 {
 export function sendPictureToTelegram2(
   data: Buffer,
   chatId:string|number,
-  caption:string, tApi): Promise<TelegramBot.Message> {
-  const fileOptions = {
-  // Explicitly specify the file name.
-    filename: 'photo.jpeg',
-    // Explicitly specify the MIME type.
-    contentType: 'image/jpeg',
-  };
+  caption:string, tApi: Api): Promise<Message> {
 
-  return tApi.sendPhoto(chatId, data, {
+  return tApi.sendPhoto({
+    chat_id: chatId,
+    photo: new InputFile(data, {
+      // Explicitly specify the file name.
+      filename: 'photo.jpeg',
+      // Explicitly specify the MIME type.
+      contentType: 'image/jpeg',
+    }),
     caption: caption,
-  }, fileOptions);
+  });
 }
 
 export type RequestAuthResponse<TData> = {
@@ -150,7 +152,7 @@ export async function getSnapshot(url: string): Promise<Buffer> {
 export class DoorbellTelegramPhotoAccessory {
 
   private service: Service;
-  private telegramAPI: any;
+  private telegramAPI: Api;
   public readonly log: Logging;
 
   private readonly name: string;
@@ -181,8 +183,8 @@ export class DoorbellTelegramPhotoAccessory {
     this.useFfmpeg = platform.config.useFfmpeg;
     this.ffmpeg = new Ffmpeg(this.log);
 
-    this.telegramAPI = new TelegramBot(this.botId, {
-      filepath: false,
+    this.telegramAPI = new Api(this.botId, {
+      timeoutMs: timeout,
     });
 
     this.log.debug('Then botId is: ' + this.botId);
