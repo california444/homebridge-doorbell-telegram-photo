@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # No BOT_ID/CHAT_ID here on purpose: without them the live test skips
-      # itself, so the matrix does not post three messages per run.
+      # No TELEGRAM_LIVE_TEST here on purpose: the live test stays switched
+      # off, so the matrix does not post one message per Node version.
       - name: Run tests
         run: npm test
 
@@ -64,8 +64,9 @@ jobs:
 
       - name: Send a real photo through the Telegram API
         env:
+          TELEGRAM_LIVE_TEST: '1'
           # Repository variables instead of secrets: Dependabot PRs do not see
           # Actions secrets but do see vars. Price: vars are not masked in logs.
           BOT_ID: ${{ vars.BOT_ID }}
           CHAT_ID: ${{ vars.CHAT_ID }}
-        run: npm run test:live
+        run: npm test

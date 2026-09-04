@@ -39,8 +39,10 @@ For the tests in `tests/` environment variables are used (e.g. Telegram `BOT_ID`
 - Add the required environment variables (e.g. `BOT_ID`, `CHAT_ID`) with your values
 - Run `npm test`
 
-Only one dedicated test (`tests/telegram.live.test.ts`) posts an actual photo into the chat configured via `CHAT_ID`. It runs as part of `npm test` and in CI, so a test run sends exactly one message. All other tests stub the Telegram API and never send anything.
+`npm test` never sends a real Telegram message - the Telegram API is stubbed there.
 
-The live test is skipped automatically when no `BOT_ID`/`CHAT_ID` are available. To run it on its own:
+Only one dedicated test (`tests/telegram.live.test.ts`) posts an actual photo into the chat configured via `CHAT_ID`. It is skipped unless `TELEGRAM_LIVE_TEST=1` is set:
 
 - Run `npm run test:live`
+
+In CI the same call runs in a separate `telegram-live` job, pinned to a single Node version, so a run sends exactly one message.
