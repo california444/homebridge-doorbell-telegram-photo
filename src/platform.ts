@@ -1,6 +1,3 @@
-process.env.NTBA_FIX_319 = '1';
-process.env.NTBA_FIX_350 = '1';
-
 import type { API, Characteristic, DynamicPlatformPlugin, Logging, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import { Device, DoorbellTelegramPhotoAccessory } from './platformAccessory.js';
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js';
