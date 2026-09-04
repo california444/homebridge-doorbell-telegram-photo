@@ -7,10 +7,6 @@ on:
 
 permissions:
   id-token: write  # Required for OIDC
-  
-env:
-  BOT_ID: ${{ vars.BOT_ID }}
-  CHAT_ID: ${{ vars.CHAT_ID }}
 
 jobs:
   build:
@@ -32,6 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # No BOT_ID/CHAT_ID here on purpose: without them the live test skips
+      # itself, so the matrix does not post three messages per run.
       - name: Run tests
         run: npm test
 
@@ -45,3 +43,29 @@ jobs:
         run: |
             npm list --outdated    
             npm audit || true  # ignore failures
+
+  telegram-live:
+    name: Telegram delivery (live)
+    runs-on: ubuntu-latest
+    # Separate job instead of part of the matrix: otherwise one message per
+    # Node version. Skipped for fork PRs, which cannot read the repo variables.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send a real photo through the Telegram API
+        env:
+          # Repository variables instead of secrets: Dependabot PRs do not see
+          # Actions secrets but do see vars. Price: vars are not masked in logs.
+          BOT_ID: ${{ vars.BOT_ID }}
+          CHAT_ID: ${{ vars.CHAT_ID }}
+        run: npm run test:live
