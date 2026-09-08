@@ -6,8 +6,10 @@ import type { Api, Message } from 'node-telegram-bot-api';
 
 const timeout = 20000;
 
-const BASE_URL = 'https://httpcan.org';
-const AUTH_BASE_URL = 'https://user:passwd@httpcan.org';
+// httpbingo.org (mccutchen/go-httpbin), not httpcan.org: the latter has been
+// answering 502 and turned the whole suite red without a code change.
+const BASE_URL = 'https://httpbingo.org';
+const AUTH_BASE_URL = 'https://user:passwd@httpbingo.org';
 
 type SentPhoto = {
   chat_id: string | number;
