@@ -2,10 +2,41 @@
   "branches": ["main"],
   "tagFormat": "v${version}",
   "plugins": [
-    ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
-    ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "breaking": true, "release": "major" },
+          { "revert": true, "release": "patch" },
+          { "type": "feat", "release": "minor" },
+          { "type": "*", "release": "patch" }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "Features" },
+            { "type": "fix", "section": "Bug Fixes" },
+            { "type": "perf", "section": "Performance" },
+            { "type": "revert", "section": "Reverts" },
+            { "type": "refactor", "section": "Refactoring" },
+            { "type": "docs", "section": "Documentation" },
+            { "type": "test", "section": "Tests" },
+            { "type": "build", "section": "Build System" },
+            { "type": "ci", "section": "CI" },
+            { "type": "style", "section": "Styles" },
+            { "type": "chore", "section": "Chores" }
+          ]
+        }
+      }
+    ],
     ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
-    ["@semantic-release/npm", { "npmPublish": false }],
+    ["@semantic-release/npm", { "npmPublish": true }],
     [
       "@semantic-release/git",
       {
