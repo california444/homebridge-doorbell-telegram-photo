@@ -1,3 +1,17 @@
+## [3.0.0](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v2.0.1...v3.0.0) (2026-09-08)
+
+### ⚠ BREAKING CHANGES
+
+* homebridge 1.x and Node 20 are no longer supported.
+The plugin now requires homebridge 2.0.0 or later on Node 22, 24 or 26.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+
+### Features
+
+* **release:** publish every merged PR to npm ([e6cd0f4](https://github.com/california444/homebridge-doorbell-telegram-photo/commit/e6cd0f443c3baaaff19cf2ae83cefd97ef3b8c1f))
+* require homebridge 2 and node 22+ ([3b1baf9](https://github.com/california444/homebridge-doorbell-telegram-photo/commit/3b1baf92673e27e649e672ec259e2804170d711c))
+
 ## [2.0.1](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v2.0.0...v2.0.1) (2026-09-08)
 
 ### Bug Fixes
