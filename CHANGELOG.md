@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v2.0.0...v2.0.1) (2026-09-08)
+
+### Bug Fixes
+
+* **deps:** resolve all reported audit vulnerabilities ([159eb49](https://github.com/california444/homebridge-doorbell-telegram-photo/commit/159eb494f9cd3ac9613d63f0d9ff0d3bd3f0d5c4))
+
 ## [2.0.0](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v1.2.0...v2.0.0) (2026-09-02)
 
 ### ⚠ BREAKING CHANGES
