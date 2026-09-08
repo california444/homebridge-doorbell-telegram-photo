@@ -3,7 +3,7 @@ import { Api } from 'node-telegram-bot-api';
 
 const timeout = 20000;
 
-const BASE_URL = 'https://httpcan.org';
+const BASE_URL = 'https://httpbingo.org';
 
 // Dedicated live test: this is the ONLY test that posts a real message into a
 // real Telegram chat. It runs only when TELEGRAM_LIVE_TEST=1 is set
