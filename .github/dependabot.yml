@@ -5,6 +5,16 @@ updates:
   schedule:
     interval: monthly
   open-pull-requests-limit: 10
+  # One PR per group instead of one per package: every merged runtime update
+  # triggers a release, so bundle them into at most one patch release a month.
+  # Major updates are not grouped and still arrive as separate PRs.
+  groups:
+    runtime:
+      dependency-type: production
+      update-types: [minor, patch]
+    dev:
+      dependency-type: development
+      update-types: [minor, patch]
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
