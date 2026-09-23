@@ -1,3 +1,6 @@
+> This file is no longer updated. Release notes for v3.0.0 and later versions live in the
+> [GitHub Releases](https://github.com/california444/homebridge-doorbell-telegram-photo/releases).
+
 ## [3.0.0](https://github.com/california444/homebridge-doorbell-telegram-photo/compare/v2.0.1...v3.0.0) (2026-09-08)
 
 ### ⚠ BREAKING CHANGES

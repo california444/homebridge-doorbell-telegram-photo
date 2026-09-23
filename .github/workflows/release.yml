@@ -3,24 +3,95 @@ name: Release
 on:
   push:
     branches: [main]
+  # Re-publish an existing tag to npm, e.g. to the beta channel or after a
+  # failed publish. Lives in this file because npm trusted publishing is bound
+  # to a single workflow filename.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Git tag to publish (e.g. v3.1.0)"
+        required: true
+        type: string
+      channel:
+        description: "npm dist-tag"
+        required: true
+        type: choice
+        default: latest
+        options:
+          - latest
+          - beta
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  id-token: write # OIDC for npm trusted publishing (and provenance)
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  release:
-    # Avoid running semantic-release on its own version-bump commit
-    if: github.repository == 'california444/homebridge-doorbell-telegram-photo' && !contains(github.event.head_commit.message, 'chore(release):')
+  ci:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/build.yml
 
+  release:
+    needs: ci
+    if: github.repository == 'california444/homebridge-doorbell-telegram-photo'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Creates the tag and the GitHub release. Nothing is committed back to
+      # main and nothing is published to npm here.
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      # Empty unless semantic-release tagged this commit.
+      - name: Detect new tag
+        id: tag
+        run: echo "tag=$(git tag --points-at HEAD | grep '^v' || true)" >> "$GITHUB_OUTPUT"
+
+  npm:
+    needs: release
+    # always(): on workflow_dispatch the release job is skipped, which would
+    # otherwise skip this job too.
+    if: >-
+      always() &&
+      github.repository == 'california444/homebridge-doorbell-telegram-photo' &&
+      (
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+        (needs.release.result == 'success' && needs.release.outputs.tag != '')
+      )
+    # Waits for approval by a required reviewer of the "npm" environment.
+    environment: npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDC for npm trusted publishing (and provenance)
+
+    env:
+      TAG: ${{ inputs.tag || needs.release.outputs.tag }}
+      CHANNEL: ${{ inputs.channel || 'latest' }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
 
       # Node 24, not 22: npm trusted publishing needs npm >= 11.5.1 and
       # Node 22 still bundles npm 10.x.
@@ -32,12 +103,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Fail before the tag and the GitHub release exist, not inside
-      # `npm publish`'s prepublishOnly hook.
-      - name: Build the project
-        run: npm run build
+      # package.json on main only holds a placeholder; the tag is the source
+      # of truth for the version.
+      - name: Set version from tag
+        run: |
+          VERSION="${TAG#v}"
+          if [ "$CHANNEL" = "latest" ] && echo "$VERSION" | grep -q -- '-'; then
+            echo "Refusing to publish a prerelease version to latest: $VERSION" >&2
+            exit 1
+          fi
+          npm version --no-git-tag-version --allow-same-version "$VERSION"
 
-      - name: Semantic Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+      - name: Publish to npm
+        run: npm publish --provenance --access public --tag "$CHANNEL"
