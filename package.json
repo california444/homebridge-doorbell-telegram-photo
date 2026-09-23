@@ -3,7 +3,7 @@
   "displayName": "Doorbell Telegram Photo",
   "type": "module",
   "version": "0.0.0-development",
-  "description": "Homebridge Plugin to send camera snapshoots on doorbell events to telegram",
+  "description": "Homebridge Plugin to send camera snapshots on doorbell events to telegram",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf ./dist && tsc",
