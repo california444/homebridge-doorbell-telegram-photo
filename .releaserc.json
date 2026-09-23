@@ -7,10 +7,7 @@
       {
         "preset": "conventionalcommits",
         "releaseRules": [
-          { "breaking": true, "release": "major" },
-          { "revert": true, "release": "patch" },
-          { "type": "feat", "release": "minor" },
-          { "type": "*", "release": "patch" }
+          { "type": "chore", "scope": "deps", "release": "patch" }
         ]
       }
     ],
@@ -24,26 +21,18 @@
             { "type": "fix", "section": "Bug Fixes" },
             { "type": "perf", "section": "Performance" },
             { "type": "revert", "section": "Reverts" },
-            { "type": "refactor", "section": "Refactoring" },
-            { "type": "docs", "section": "Documentation" },
-            { "type": "test", "section": "Tests" },
-            { "type": "build", "section": "Build System" },
-            { "type": "ci", "section": "CI" },
-            { "type": "style", "section": "Styles" },
-            { "type": "chore", "section": "Chores" }
+            { "type": "chore", "scope": "deps", "section": "Dependencies" }
           ]
         }
       }
     ],
-    ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
-    ["@semantic-release/npm", { "npmPublish": true }],
     [
-      "@semantic-release/git",
+      "@semantic-release/github",
       {
-        "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
-        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        "successComment": false,
+        "failComment": false,
+        "releasedLabels": false
       }
-    ],
-    "@semantic-release/github"
+    ]
   ]
 }

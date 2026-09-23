@@ -3,10 +3,7 @@ name: Build and Lint
 on:
   pull_request:
   workflow_dispatch:
-
-
-permissions:
-  id-token: write  # Required for OIDC
+  workflow_call: # from release.yml, before every release
 
 jobs:
   build:
