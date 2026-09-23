@@ -46,7 +46,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^26.4.0",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "conventional-changelog-conventionalcommits": "^9.1.0",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
     "dotenv": "^18.0.1",
     "eslint": "^10.0.1",
     "homebridge": "^2.0.0-beta.0",
