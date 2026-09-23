@@ -15,6 +15,12 @@ updates:
     dev:
       dependency-type: development
       update-types: [minor, patch]
+  ignore:
+    # v10 needs conventional-changelog-writer@9, but
+    # @semantic-release/release-notes-generator still ships writer@8.
+    # Lift this once the generator moves to writer@9.
+    - dependency-name: conventional-changelog-conventionalcommits
+      update-types: [version-update:semver-major]
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
