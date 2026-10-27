@@ -3,16 +3,26 @@ updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: monthly
+    interval: weekly
   open-pull-requests-limit: 10
   # One PR per group instead of one per package: every merged runtime update
-  # triggers a release, so bundle them into at most one patch release a month.
+  # triggers a release, so bundle them into at most one patch release a week.
   # Major updates are not grouped and still arrive as separate PRs.
   groups:
     runtime:
       dependency-type: production
       update-types: [minor, patch]
     dev:
+      dependency-type: development
+      update-types: [minor, patch]
+    # Groups without applies-to only cover version updates; security updates
+    # need their own groups or they keep arriving one PR per package.
+    runtime-security:
+      applies-to: security-updates
+      dependency-type: production
+      update-types: [minor, patch]
+    dev-security:
+      applies-to: security-updates
       dependency-type: development
       update-types: [minor, patch]
   ignore:
@@ -24,5 +34,8 @@ updates:
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
-    interval: monthly
+    interval: weekly
   open-pull-requests-limit: 10
+  groups:
+    actions:
+      patterns: ["*"]
